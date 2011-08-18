@@ -72,15 +72,15 @@ https.get({
                             }
                             var urls = data[j].entities.urls;
                             for(var k in urls) {
-                                if(urls[k].expanded_url != null) {
-                                    ++found_urls;
+                                var url = unescape(urls[k].expanded_url);
+                                if(url == null) { continue; }
 
-                                    var expander = new (require('url-expander').SingleUrlExpander)(urls[k].expanded_url);
-                                    expander.on('expanded', function(original, expandedUrl) {
-                                        result.write(expandedUrl + '\n');
-                                    });
-                                    expander.expand();
-                                }
+                                ++found_urls;
+                                var expander = new (require('url-expander').SingleUrlExpander)(url);
+                                expander.on('expanded', function(original, expandedUrl) {
+                                    result.write(expandedUrl + '\n');
+                                });
+                                expander.expand();
                             }
                         }
                         config[list_name] = { 'since_id': data[0].id_str };
