@@ -73,7 +73,7 @@ https.get({
                             var urls = data[j].entities.urls;
                             for(var k in urls) {
                                 var url = unescape(urls[k].expanded_url);
-                                if(url == null) { continue; }
+                                if(url == 'null') { continue; }
 
                                 ++found_urls;
                                 var expander = new (require('url-expander').SingleUrlExpander)(url);
