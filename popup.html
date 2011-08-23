@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="jquery.min.js"></script>
+    <script src="popup.js"></script>
+  </head>
+
+  <body onload="load()">
+    <div id="opened"></div>
+    <div id="unread"></div>
+    <div id="can_open_tab"></div>
+    <hr/>
+    <input id="auto_open_checkbox" type="checkbox" onclick="auto_open()">
+    Auto-open
+    </input>
+    <hr/>
+    <input type="button" value="Options" onclick="open_options()"/>
+    <input type="button" value="Backup Now" onclick="backup()"/>
+    <input type="button" value="Fetch Now" onclick="fetch()"/>
+  </body>
+</html>

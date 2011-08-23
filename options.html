@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <title>twitter2url Options</title>
+    <script src="jquery.min.js"></script>
+    <script src="options.js"></script>
+  </head>
+
+  <body onload="restore_options()">
+    <h1>Twitter2URL Options</h1>
+    <hr/>
+    <form>
+      <table>
+        <tr>
+          <td>Auto-open Freq</td>
+          <td><input id="auto_open_freq" type="text"/>(milli-second)</td>
+        </tr>
+        <tr>
+          <td>Backup Freq</td>
+          <td><input id="backup_freq" type="text"/>(milli-second)</td>
+        </tr>
+        <tr>
+          <td>Check Freq</td>
+          <td><input id="check_freq" type="text"/>(milli-second)</td>
+        </tr>
+        <tr>
+          <td>Open Tab Max</td>
+          <td><input id="open_tab_max" type="text"/>(item)</td>
+        </tr>
+        <tr>
+          <td>Tweet Max</td>
+          <td><input id="tweet_max" type="text"/>(tweet)</td>
+        </tr>
+      </table>
+
+      <hr/>
+
+      <div id="filters">
+      </div>
+      <input type="button" onclick="add_filter()" value="Add Filter"/>
+
+      <hr/>
+
+      <input type="button" onclick="save_options()" value="Save"/>
+      <input type="button" onclick="restore_options()" value="Restore"/>
+    </form>
+  </body>
+</html>
