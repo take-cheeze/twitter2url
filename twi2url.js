@@ -23,7 +23,7 @@ var consomer = consumer || {
     CONSUMER_KEY: '', CONSUMER_SECRET: ''
 };
 
-var twitter2url = twitter2url || {
+var twi2url = twi2url || {
     LOCAL_STORAGE_KEY: [
         'oauth_token',
         'oauth_token_secret',
@@ -51,14 +51,14 @@ var twitter2url = twitter2url || {
 
     signout: function() {
         $.each(
-            twitter2url.LOCAL_STORAGE_KEY,
+            twi2url.LOCAL_STORAGE_KEY,
             function(key, value) { delete localStorage[value]; }
         );
     },
     is_signed_in: function() {
         var ret = true;
         $.each(
-            twitter2url.LOCAL_STORAGE_KEY,
+            twi2url.LOCAL_STORAGE_KEY,
             function(key, value) {
                 if(!(value in localStorage)) { ret = false; }
             }
@@ -66,7 +66,7 @@ var twitter2url = twitter2url || {
         return ret;
     },
     signin: function() {
-        twitter2url.oauth = new OAuth(
+        twi2url.oauth = new OAuth(
             {
                 consumerKey: consumer.CONSUMER_KEY,
                 consumerSecret: consumer.CONSUMER_SECRET,
@@ -76,31 +76,31 @@ var twitter2url = twitter2url || {
                 accessTokenUrl: 'https://api.twitter.com/oauth/access_token'
             }
         );
-        if(twitter2url.is_signed_in()) {
-            twitter2url.oauth.setAccessToken(
+        if(twi2url.is_signed_in()) {
+            twi2url.oauth.setAccessToken(
                 localStorage.oauth_token, localStorage.oauth_token_secret);
             return;
         }
 
-        twitter2url.oauth.fetchRequestToken(
+        twi2url.oauth.fetchRequestToken(
             function(url) {
-                twitter2url.open_current_window_tab(url, true);
+                twi2url.open_current_window_tab(url, true);
 
                 var pin = prompt('Please enter your PIN', '');
-                twitter2url.oauth.setVerifier(pin);
-                twitter2url.oauth.fetchAccessToken(
+                twi2url.oauth.setVerifier(pin);
+                twi2url.oauth.fetchAccessToken(
                     function(data) {
                         var q = $.query.load('?' + data.text);
                         // console.log(q.toString());
                         $.each(
-                            twitter2url.LOCAL_STORAGE_KEY,
+                            twi2url.LOCAL_STORAGE_KEY,
                             function(k, v) {
                                 localStorage[v] = q.get(v);
                             }
                         );
-                    }, twitter2url.error
+                    }, twi2url.error
                 );
-            }, twitter2url.error
+            }, twi2url.error
         );
     },
     open_current_window_tab: function(url, selected, callback) {
@@ -121,20 +121,20 @@ var twitter2url = twitter2url || {
 
     tab_remove: function(tab_id, remove_info) {
         $.each(
-            twitter2url.tab_ids, function(key, value) {
+            twi2url.tab_ids, function(key, value) {
                 if(value == tab_id) {
-                    if(twitter2url.auto_open_count > 0) {
-                        twitter2url.auto_open_count--;
+                    if(twi2url.auto_open_count > 0) {
+                        twi2url.auto_open_count--;
                     }
-                    twitter2url.tab_ids.splice(key, 1);
+                    twi2url.tab_ids.splice(key, 1);
                 }
             }
         );
     },
     match_filter: function(str) {
         if(str == null) return true;
-        for(var i in twitter2url.filters) {
-            if(twitter2url.filters[i].test(str)) {
+        for(var i in twi2url.filters) {
+            if(twi2url.filters[i].test(str)) {
                 // console.log("Filtered URL: " + str);
                 return true;
             }
@@ -146,29 +146,29 @@ var twitter2url = twitter2url || {
         var result = [];
 
         $.each(
-            twitter2url.urls, function(k, v) {
+            twi2url.urls, function(k, v) {
                 if(
                     (v in table) ||
-                    twitter2url.match_filter(v)
+                    twi2url.match_filter(v)
                   ) { return; }
                 result.push(v);
                 table[v] = '';
                 /*
-                twitter2url.in_history(
+                twi2url.in_history(
                     v, function(res) {
-                        if(!res) { twitter2url.push(v); }
+                        if(!res) { twi2url.push(v); }
                     }
                 );
                  */
             }
         );
-        twitter2url.urls = result;
+        twi2url.urls = result;
     },
     backup: function() {
-        twitter2url.clean_urls();
+        twi2url.clean_urls();
         $.each(
             ['since', 'urls'], function(index, value) {
-                localStorage[value] = JSON.stringify(twitter2url[value]);
+                localStorage[value] = JSON.stringify(twi2url[value]);
             }
         );
     },
@@ -192,17 +192,17 @@ var twitter2url = twitter2url || {
                         callback(result['long-url']);
                     },
                     error: function(data) {
-                        twitter2url.urls.push(url);
-                        twitter2url.error(data);
+                        twi2url.urls.push(url);
+                        twi2url.error(data);
                     }
                 }
             );
         } else { callback(url); }
     },
     fetch: function() {
-        if(!twitter2url.is_signed_in()) { return; }
+        if(!twi2url.is_signed_in()) { return; }
 
-        twitter2url.oauth.getJSON(
+        twi2url.oauth.getJSON(
             'https://api.twitter.com/1/statuses/home_timeline.json?' +
                 $.param({
                             'count': localStorage.tweet_max,
@@ -210,22 +210,22 @@ var twitter2url = twitter2url || {
                             'include_entities': 'true',
                             'include_rts': 'true'
                         }) +
-                ('home_timeline' in twitter2url.since
-                ? '&' + $.param({'since_id': twitter2url.since.home_timeline}) : ''),
+                ('home_timeline' in twi2url.since
+                ? '&' + $.param({'since_id': twi2url.since.home_timeline}) : ''),
             function(data) {
-                twitter2url.process_data(data);
+                twi2url.process_data(data);
                 if(data.length > 0) {
-                    twitter2url.since.home_timeline = data[0].id_str;
+                    twi2url.since.home_timeline = data[0].id_str;
                 }
-            }, twitter2url.error
+            }, twi2url.error
         );
-        twitter2url.oauth.getJSON(
+        twi2url.oauth.getJSON(
             'https://api.twitter.com/1/lists/all.json?' +
                 $.param({'user_id': localStorage.user_id}),
             function(data) {
                 $.each(
                     data, function(k, v) {
-                        twitter2url.oauth.getJSON(
+                        twi2url.oauth.getJSON(
                             'https://api.twitter.com/1/lists/statuses.json?' +
                                 $.param({
                                             'include_entities': 'true',
@@ -233,18 +233,18 @@ var twitter2url = twitter2url || {
                                             'list_id': v.id_str,
                                             'per_page': localStorage.tweet_max
                                         }) +
-                                (v.full_name in twitter2url.since
-                                 ? '&' + $.param({'since_id': twitter2url.since[v.full_name]}) : ''),
+                                (v.full_name in twi2url.since
+                                 ? '&' + $.param({'since_id': twi2url.since[v.full_name]}) : ''),
                             function(data) {
-                                twitter2url.process_data(data);
+                                twi2url.process_data(data);
                                 if(data.length > 0) {
-                                    twitter2url.since[v.full_name] = data[0].id_str;
+                                    twi2url.since[v.full_name] = data[0].id_str;
                                 }
-                            }, twitter2url.error
+                            }, twi2url.error
                         );
                     }
                 );
-            }, twitter2url.error
+            }, twi2url.error
         );
     },
     process_data: function(data) {
@@ -256,9 +256,9 @@ var twitter2url = twitter2url || {
                     v.entities.urls, function(k, v) {
                         if(!v.expanded_url) return;
 
-                        twitter2url.expand_url(
+                        twi2url.expand_url(
                             v.expanded_url, function(result) {
-                                twitter2url.urls.push(result);
+                                twi2url.urls.push(result);
                             }
                         );
                     }
@@ -268,85 +268,85 @@ var twitter2url = twitter2url || {
     },
 
     can_open_tab: function() {
-        return(twitter2url.auto_open_count <
+        return(twi2url.auto_open_count <
                parseInt(localStorage.open_tab_max));
     },
     auto_open: function(enable) {
-        if(enable != undefined) { twitter2url.auto_open_state = enable; }
+        if(enable != undefined) { twi2url.auto_open_state = enable; }
 
-        if(twitter2url.auto_open_state) {
-            if(twitter2url.can_open_tab()) {
-                var url = twitter2url.urls.shift();
-                twitter2url.auto_open_count++;
-                twitter2url.in_history(
+        if(twi2url.auto_open_state) {
+            if(twi2url.can_open_tab()) {
+                var url = twi2url.urls.shift();
+                twi2url.auto_open_count++;
+                twi2url.in_history(
                     url, function(exists) {
                         if(exists) {
-                            twitter2url.auto_open_count--;
+                            twi2url.auto_open_count--;
                             return;
                         }
 
-                        twitter2url.open_current_window_tab(
+                        twi2url.open_current_window_tab(
                             url, false, function(tab) {
-                                twitter2url.tab_ids.push(tab.id);
+                                twi2url.tab_ids.push(tab.id);
                             }
                         );
                     }
                 );
             }
-            setTimeout(twitter2url.auto_open,
+            setTimeout(twi2url.auto_open,
                        parseInt(localStorage.auto_open_freq));
         }
     },
     auto_fetch: function() {
-        twitter2url.fetch();
-        setTimeout(twitter2url.auto_fetch,
+        twi2url.fetch();
+        setTimeout(twi2url.auto_fetch,
                    parseInt(localStorage.check_freq));
     },
     auto_backup: function() {
-        twitter2url.backup();
-        setTimeout(twitter2url.auto_backup,
+        twi2url.backup();
+        setTimeout(twi2url.auto_backup,
                    parseInt(localStorage.backup_freq));
     },
     build_filters: function() {
-        twitter2url.filters = [];
+        twi2url.filters = [];
         $.each(
             JSON.parse(localStorage.filters), function(k, v) {
-                twitter2url.filters.push(new RegExp(v));
+                twi2url.filters.push(new RegExp(v));
             }
         );
     },
     init: function() {
         $.each(
-            twitter2url.defaults, function(key, value) {
+            twi2url.defaults, function(key, value) {
                 if(!(key in localStorage)) {
                     localStorage[key] = JSON.stringify(value);
                 }
             }
         );
-        chrome.tabs.onRemoved.addListener(twitter2url.tab_remove);
-        twitter2url.build_filters();
+        chrome.tabs.onRemoved.addListener(twi2url.tab_remove);
+        twi2url.build_filters();
 
-        twitter2url.signin();
+        twi2url.signin();
 
-        setTimeout(twitter2url.auto_fetch,
+        setTimeout(twi2url.auto_fetch,
                    parseInt(localStorage.check_freq));
-        setTimeout(twitter2url.auto_backup,
+        setTimeout(twi2url.auto_backup,
                    parseInt(localStorage.backup_freq));
 
         setInterval( // badge
             function() {
                 chrome.browserAction.setBadgeText(
                     {
-                        text: twitter2url.auto_open_state
-                            ? twitter2url.can_open_tab()
-                            ? twitter2url.auto_open_count.toString()
-                            : '+' + twitter2url.auto_open_count.toString()
-                        : twitter2url.urls.length.toString()
+                        text: twi2url.auto_open_state
+                            ? twi2url.can_open_tab()
+                            ? twi2url.auto_open_count.toString()
+                            : '+' + twi2url.auto_open_count.toString()
+                        : twi2url.urls.length.toString()
                     }
                 );
                 chrome.browserAction.setBadgeBackgroundColor(
                     {
-                        color: twitter2url.auto_open_state
+                        color: twi2url.auto_open_state
                             ? [0, 0, 255, 255] : [255, 0, 0, 255]
                     }
                 );
@@ -355,4 +355,4 @@ var twitter2url = twitter2url || {
     }
 };
 
-twitter2url.init();
+twi2url.init();

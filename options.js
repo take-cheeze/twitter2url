@@ -33,18 +33,18 @@ function save_options() {
     /*
      TODO: check values
      */
-    $.each(get_background().twitter2url.defaults, function(k, v) {
+    $.each(get_background().twi2url.defaults, function(k, v) {
                get_background().localStorage[k] = $("#" + k).val();
            });
     get_background().localStorage.filters = JSON.stringify(filters);
 
-    get_background().twitter2url.build_filters();
+    get_background().twi2url.build_filters();
 
     restore_options();
 }
 
 function restore_options() {
-    $.each(get_background().twitter2url.defaults, function(k, v) {
+    $.each(get_background().twi2url.defaults, function(k, v) {
                $("#" + k).val(get_background().localStorage[k]);
            });
     filters = JSON.parse(get_background().localStorage.filters);
