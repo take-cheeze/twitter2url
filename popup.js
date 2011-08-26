@@ -10,6 +10,10 @@ function open_options() {
     get_background().twi2url.open_current_window_tab(
         chrome.extension.getURL("options.html"), true);
 }
+function open_gallery() {
+    get_background().twi2url.open_current_window_tab(
+        chrome.extension.getURL("gallery.html"), true);
+}
 function backup() { get_background().twi2url.backup(); }
 function fetch() { get_background().twi2url.fetch(); }
 
@@ -21,5 +25,6 @@ function load() {
                       (twi2url.can_open_tab()? '': '+') +
                       twi2url.auto_open_count);
     $('#unread').text("Unread: " + twi2url.urls.length);
+    $('#gallery').text("Gallery: " + twi2url.gallery_stack.length);
     setTimeout(load, 500);
 }

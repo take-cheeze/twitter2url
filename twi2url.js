@@ -39,12 +39,15 @@ var twi2url = twi2url || {
     },
     since: 'since' in localStorage ? JSON.parse(localStorage.since) : {},
     urls: 'urls' in localStorage ? JSON.parse(localStorage.urls) : [],
+    gallery_stack: 'gallery_stack' in localStorage
+        ? JSON.parse(localStorage.gallery_stack) : [],
     auto_open_state: false,
     auto_open_count: 0,
     tab_ids: [], // list of auto opened tab id
     filters: [], // list of filter regexp
 
     error: function(obj) {
+        console.trace();
         console.error(obj);
     },
 
@@ -140,6 +143,40 @@ var twi2url = twi2url || {
         }
         return false;
     },
+    match_gallery_filter: function(str, callback) {
+        var GALLERY_FILTER = {
+            "^http://twitpic\\.com/([a-zA-Z0-9]+)$": function(url, callback) {
+                var id = url.replace(new RegExp('^http://twitpic\\.com/([a-zA-Z0-9]*)$'), '$1');
+                $.ajax(
+                    {
+                        'url': 'http://api.twitpic.com/2/media/show.json?id=' + id,
+                        dataType: 'json',
+                        success: function(data) {
+                            callback(
+                                {
+                                    'url': url + '/full',
+                                    'message':  data.message,
+                                    'photo_url': 'http://twitpic.com/show/large/' + id
+                                }
+                            );
+                        },
+                        error: function(res) {
+                            twi2url.error(res);
+                            twi2url.urls.push(str);
+                        }
+                    }
+                );
+            }
+        };
+        for(var k in GALLERY_FILTER) {
+            if((new RegExp(k)).test(str)) {
+                // console.log(str);
+                GALLERY_FILTER[k](str, callback);
+                return true;
+            }
+        }
+        return false;
+    },
     clean_urls: function() {
         var table = {};
         var result = [];
@@ -150,6 +187,15 @@ var twi2url = twi2url || {
                     (v in table) ||
                     twi2url.match_filter(v)
                   ) { return; }
+
+                if(twi2url.match_gallery_filter(
+                       v, function(v) {
+                           twi2url.gallery_stack.push(v);
+                       }))
+                {
+                    return;
+                }
+
                 result.push(v);
                 table[v] = '';
                 /*
@@ -166,7 +212,7 @@ var twi2url = twi2url || {
     backup: function() {
         twi2url.clean_urls();
         $.each(
-            ['since', 'urls'], function(index, value) {
+            ['since', 'urls', 'gallery_stack'], function(index, value) {
                 localStorage[value] = JSON.stringify(twi2url[value]);
             }
         );

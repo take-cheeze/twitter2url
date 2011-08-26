@@ -19,7 +19,8 @@
         "tabs",
         "unlimitedStorage",
         "https://api.twitter.com/*",
-        "http://api.longurl.org/v2/*"
+        "http://api.longurl.org/v2/*",
+        "http://api.twitpic.com/2/*"
     ],
     "options_page": "options.html"
 }
