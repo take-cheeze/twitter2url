@@ -35,8 +35,7 @@ var twi2url = twi2url || {
         'backup_freq': 1000 * 60 * 5, // 5 minutes
         'check_freq': 1000 * 60 * 15, // 15 minutes
         'open_tab_max': 30, // 30
-        'tweet_max': 200, // 200 tweets
-        'filters': [], // empty filter list
+        'tweet_max': 200 // 200 tweets
     },
     since: 'since' in localStorage ? JSON.parse(localStorage.since) : {},
     urls: 'urls' in localStorage ? JSON.parse(localStorage.urls) : [],
@@ -316,6 +315,8 @@ var twi2url = twi2url || {
         );
     },
     init: function() {
+        if(!('filters' in localStorage)) { localStorage.filters = '[]'; }
+
         $.each(
             twi2url.defaults, function(key, value) {
                 if(!(key in localStorage)) {
