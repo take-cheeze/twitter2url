@@ -15,6 +15,15 @@ function draw() {
         $('#image_canvas').html('');
         $('#image_message').html('');
     }
+
+    (function() {
+         var gallery_stack = get_background().twi2url.gallery_stack;
+         cache = [];
+         for(var i = 0; i < Math.min(gallery_stack.length, CACHE_SIZE); i++) {
+             cache.unshift(new Image());
+             cache[0].src = gallery_stack[i].photo_url;
+         }
+     })();
 }
 
 function next() {
@@ -22,18 +31,11 @@ function next() {
     if(gallery_stack.length <= 0) { return; }
 
     history.push(gallery_stack.shift());
-    if(gallery_stack.length > CACHE_SIZE) {
-        cache.unshift(new Image());
-        cache[0].src = gallery_stack[1].photo_url;
-        if(cache.length > CACHE_SIZE) { cache.pop(); }
-    }
-    draw();
 }
 function prev() {
     if(history.length <= 0) { return; }
 
     get_background().twi2url.gallery_stack.unshift(history.pop());
-    draw();
 }
 function open_url() {
     if(get_background().twi2url.gallery_stack.length <= 0) { return; }
@@ -52,11 +54,4 @@ function get_background() {
     return chrome.extension.getBackgroundPage();
 }
 
-setInterval(this.draw, 1000);
-(function() {
-     var gallery_stack = get_background().twi2url.gallery_stack;
-     for(var i = 0; i < Math.min(gallery_stack.length, CACHE_SIZE); i++) {
-         cache.unshift(new Image());
-         cache[0].src = gallery_stack[i].photo_url;
-     }
-})();
+setInterval(this.draw, 500);
