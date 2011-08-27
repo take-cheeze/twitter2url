@@ -2,7 +2,7 @@ var history = [];
 
 function draw() {
     $('#left_count').html(get_background().twi2url.gallery_stack.length +
-                          ' images left');
+                          ' items left');
 
     if(get_background().twi2url.gallery_stack.length > 0) {
         var current = get_background().twi2url.gallery_stack[0];
