@@ -18,8 +18,13 @@ function draw() {
          var gallery_stack = get_background().twi2url.gallery_stack;
          cache = [];
          for(var i = 0; i < Math.min(gallery_stack.length, CACHE_SIZE); i++) {
-             cache.unshift(new Image());
-             cache[0].src = gallery_stack[i].photo_url;
+             (function(tag) {
+                  var m = tag.match(/<img src="([^"]*)"/);
+                  if(m.length == 2) {
+                      cache.unshift(new Image());
+                      cache[0].src = m[1];
+                  }
+              })(gallery_stack[i].tag);
          }
      })();
 }
@@ -37,7 +42,6 @@ function prev() {
 }
 function open_url() {
     if(get_background().twi2url.gallery_stack.length <= 0) { return; }
-
     window.open(get_background().twi2url.gallery_stack[0].url);
 }
 
