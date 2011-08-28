@@ -239,6 +239,18 @@ var twi2url = twi2url || {
                 callback(
                     url + '/original', '',
                     image_tag('http://static.ow.ly/photos/normal/' + id + '.jpg'));
+            },
+            "^http://lockerz.com/s/[0-9]+$": function(url, callback) {
+                $.ajax(
+                    {
+                        'url': url, dataType: 'html',
+                        success: function(data) {
+                            callback(
+                                url, data.match(/<p>([^<]+)<\/p>/)[1],
+                                image_tag(data.match(/'<img id="photo" src="([^"]+)"'/)[1])
+                            );
+                        }, error: error_callback
+                    });
             }
         };
         try {
