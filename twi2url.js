@@ -144,37 +144,105 @@ var twi2url = twi2url || {
         return false;
     },
     match_gallery_filter: function(str, callback) {
+        var error_callback = function(res) {
+            twi2url.error(res);
+            twi2url.urls.push(str);
+            throw new Error('match_gallery_filter error');
+        };
+        var get_og_image = function(data) {
+            var m = data.match(/<meta property=["']og:image["'] content=["']([^"]+)["']/);
+            if(m.length != 2) { throw new Error('og:image parse error'); }
+            return m[1];
+        };
+        var get_og_description = function(data) {
+            var m = data.match(/<meta property=["']og:description["'] content=["']([^"]+)["']/);
+            if(m.length != 2) { throw new Error('og:description parse error'); }
+            return m[1];
+        };
+        var image_tag = function(url) {
+            return '<img src="' + url + '">';
+        };
+        var og_callback = function(url, callback) {
+            $.ajax(
+                {
+                    'url': url, dataType: 'html',
+                    success: function(data) {
+                        callback(
+                            url, get_og_description(data),
+                            image_tag(get_og_image(data))
+                        );
+                    }, error: error_callback
+                });
+        };
         var GALLERY_FILTER = {
             "^http://twitpic\\.com/([a-zA-Z0-9]+)$": function(url, callback) {
-                var id = url.replace(new RegExp('^http://twitpic\\.com/([a-zA-Z0-9]*)$'), '$1');
+                var id = url.replace(/^http:\/\/twitpic.com\/([a-zA-Z0-9]+)$/, '$1');
                 $.ajax(
                     {
                         'url': 'http://api.twitpic.com/2/media/show.json?id=' + id,
                         dataType: 'json',
                         success: function(data) {
                             callback(
-                                {
-                                    'url': url + '/full',
-                                    'message':  data.message,
-                                    'photo_url': 'http://twitpic.com/show/large/' + id
-                                }
+                                url + '/full', data.message,
+                                image_tag('http://twitpic.com/show/large/' + id)
                             );
-                        },
-                        error: function(res) {
-                            twi2url.error(res);
-                            twi2url.urls.push(str);
-                        }
-                    }
-                );
+                        }, error: error_callback
+                    });
+            },
+            "^http://yfrog.com/([a-z0-9]*)$": function(url, callback) {
+                $.ajax(
+                    {
+                        'url': url, dataType: 'html',
+                        success: function(data) {
+                            callback(
+                                url.replace('yfrog.com/', 'yfrog.com/z/'),
+                                get_og_description(data),
+                                image_tag(get_og_image(data))
+                            );
+                        }, error: error_callback
+                    });
+            },
+            "^http://seiga.nicovideo.jp/seiga/im": og_callback,
+            "^http://www.pixiv.net/member_illust.php": og_callback,
+            "^http://instagr.am/p/[\\-_a-zA-Z0-9]+/?$": og_callback,
+            "^http://soundtracking.com/tracks/[a-z0-9]+$": og_callback,
+            "^http://p.twipple.jp/[a-zA-Z0-9]+$": function(url, callback) {
+                var id = url.replace(/'^http:\/\/p.twipple.jp\/([a-zA-Z0-9]*)$/, '$1');
+                var photo_url = 'http://p.twipple.jp/data';
+                for(var i in id) { photo_url += '/' + id[i]; }
+                $.ajax(
+                    {
+                        'url': url, dataType: 'html',
+                        success: function(data) {
+                            callback(
+                                url, get_og_description(data),
+                                image_tag(photo_url));
+                        }, error: error_callback
+                    });
+            },
+            '^.+\\.png$': function(url, callback) { callback(url, '', image_tag(url)); },
+            '^.+\\.JPG$': function(url, callback) { callback(url, '', image_tag(url)); },
+            '^.+\\.jpg$': function(url, callback) { callback(url, '', image_tag(url)); },
+            '^.+\\.gif$': function(url, callback) { callback(url, '', image_tag(url)); },
+            'http://movapic.com/pic/[a-z0-9]+': function(url, callback) {
+                callback(
+                    url.replace(
+                            /http:\/\/movapic.com\/pic\/([a-z0-9]+)/,
+                        'http://image.movapic.com/pic/m_$1.jpeg'
+                    ), '', image_tag(url + '.png'));
+            },
+            'http://gyazo.com/[a-z0-9]+': function(url, callback) {
+                callback(url, '', image_tag(url + '.png'));
             }
         };
-        for(var k in GALLERY_FILTER) {
-            if((new RegExp(k)).test(str)) {
-                // console.log(str);
-                GALLERY_FILTER[k](str, callback);
-                return true;
+        try {
+            for(var k in GALLERY_FILTER) {
+                if((new RegExp(k)).test(str)) {
+                    GALLERY_FILTER[k](str, callback);
+                    return true;
+                }
             }
-        }
+        } catch(e) {}
         return false;
     },
     clean_urls: function() {
@@ -189,33 +257,25 @@ var twi2url = twi2url || {
                   ) { return; }
 
                 if(twi2url.match_gallery_filter(
-                       v, function(v) {
-                           twi2url.gallery_stack.push(v);
-                       }))
-                {
-                    return;
-                }
+                       v, function(url, message, tag) {
+                           var t = {
+                               'url': url, 'message': message, 'tag': tag };
+                           twi2url.gallery_stack.push(t);
+                       })) { return; }
 
                 result.push(v);
                 table[v] = '';
-                /*
-                twi2url.in_history(
-                    v, function(res) {
-                        if(!res) { twi2url.push(v); }
-                    }
-                );
-                 */
             }
         );
         twi2url.urls = result;
     },
     backup: function() {
-        twi2url.clean_urls();
         $.each(
             ['since', 'urls', 'gallery_stack'], function(index, value) {
                 localStorage[value] = JSON.stringify(twi2url[value]);
             }
         );
+        twi2url.clean_urls();
     },
     in_history: function(url, callback) {
         // console.log("Searching: " + url);

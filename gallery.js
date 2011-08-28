@@ -7,9 +7,7 @@ function draw() {
 
     if(get_background().twi2url.gallery_stack.length > 0) {
         var current = get_background().twi2url.gallery_stack[0];
-        $('#image_canvas').html(
-            '<img src="' + current.photo_url +
-                '" alt="' + current.message + '" />');
+        $('#image_canvas').html(current.tag);
         $('#image_message').html(current.message);
     } else {
         $('#image_canvas').html('');

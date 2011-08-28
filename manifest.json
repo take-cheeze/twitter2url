@@ -20,7 +20,13 @@
         "unlimitedStorage",
         "https://api.twitter.com/*",
         "http://api.longurl.org/v2/*",
-        "http://api.twitpic.com/2/*"
+        "http://api.twitpic.com/2/*",
+        "http://yfrog.com/*",
+        "http://www.pixiv.net/*",
+        "http://instagr.am/p/*",
+        "http://p.twipple.jp/*",
+        "http://seiga.nicovideo.jp/seiga/*",
+        "http://soundtracking.com/tracks/*"
     ],
     "options_page": "options.html"
 }
