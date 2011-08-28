@@ -150,12 +150,12 @@ var twi2url = twi2url || {
             throw new Error('match_gallery_filter error');
         };
         var get_og_image = function(data) {
-            var m = data.match(/<meta property=["']og:image["'] content=["']([^"]+)["']/);
+            var m = data.match(/<meta property=["']og:image["'] content=["']([^'"]+)["']/);
             if(m.length != 2) { throw new Error('og:image parse error'); }
             return m[1];
         };
         var get_og_description = function(data) {
-            var m = data.match(/<meta property=["']og:description["'] content=["']([^"]+)["']/);
+            var m = data.match(/<meta property=["']og:description["'] content=["']([^'"]+)["']/);
             if(m.length != 2) { throw new Error('og:description parse error'); }
             return m[1];
         };
@@ -206,6 +206,7 @@ var twi2url = twi2url || {
             "^http://www.pixiv.net/member_illust.php": og_callback,
             "^http://instagr.am/p/[\\-_a-zA-Z0-9]+/?$": og_callback,
             "^http://soundtracking.com/tracks/[a-z0-9]+$": og_callback,
+            "^http://img.ly/[A-Za-z0-9]+$": og_callback,
             "^http://p.twipple.jp/[a-zA-Z0-9]+$": function(url, callback) {
                 var id = url.replace(/'^http:\/\/p.twipple.jp\/([a-zA-Z0-9]*)$/, '$1');
                 var photo_url = 'http://p.twipple.jp/data';
