@@ -159,9 +159,9 @@ var twi2url = twi2url || {
             if(m.length != 2) { throw new Error('og:description parse error'); }
             return m[1];
         };
-        var image_tag = function(url) {
-            return '<img src="' + url + '">';
-        };
+        var image_tag = function(url) { return '<img src="' + url + '">'; };
+        var image_file = function(url, callback)
+            { callback(url, '', image_tag(url)); };
         var og_callback = function(url, callback) {
             $.ajax(
                 {
@@ -220,19 +220,24 @@ var twi2url = twi2url || {
                         }, error: error_callback
                     });
             },
-            '^.+\\.png$': function(url, callback) { callback(url, '', image_tag(url)); },
-            '^.+\\.JPG$': function(url, callback) { callback(url, '', image_tag(url)); },
-            '^.+\\.jpg$': function(url, callback) { callback(url, '', image_tag(url)); },
-            '^.+\\.gif$': function(url, callback) { callback(url, '', image_tag(url)); },
-            'http://movapic.com/pic/[a-z0-9]+': function(url, callback) {
+            '^.+\\.png$': image_file, '^.+\\.JPG$': image_file,
+            '^.+\\.jpg$': image_file, '^.+\\.gif$': image_file,
+            '^.+\\.jpeg$': image_file,
+            '^http://movapic.com/pic/[a-z0-9]+$': function(url, callback) {
                 callback(
                     url.replace(
                             /http:\/\/movapic.com\/pic\/([a-z0-9]+)/,
                         'http://image.movapic.com/pic/m_$1.jpeg'
                     ), '', image_tag(url + '.png'));
             },
-            'http://gyazo.com/[a-z0-9]+': function(url, callback) {
+            '^http://gyazo.com/[a-z0-9]+$': function(url, callback) {
                 callback(url, '', image_tag(url + '.png'));
+            },
+            "^http://ow.ly/i/[a-zA-Z0-9]+$": function(url, callback) {
+                var id = url.match(/^http:\/\/ow.ly\/i\/([a-zA-Z0-9]+)$/)[1];
+                callback(
+                    url + '/original', '',
+                    image_tag('http://static.ow.ly/photos/normal/' + id + '.jpg'));
             }
         };
         try {
