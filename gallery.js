@@ -1,5 +1,6 @@
 var history = [];
 var cache = [], CACHE_SIZE = 5;
+var last_draw = null;
 
 function draw() {
     $('#left_count').html(get_background().twi2url.gallery_stack.length +
@@ -7,9 +8,13 @@ function draw() {
 
     if(get_background().twi2url.gallery_stack.length > 0) {
         var current = get_background().twi2url.gallery_stack[0];
-        $('#image_canvas').html(current.tag);
-        $('#image_message').html(current.message);
+        if((last_draw === null) || (current.url !== last_draw.url)) {
+            $('#image_canvas').html(current.tag);
+            $('#image_message').html(current.message);
+            last_draw = current;
+        }
     } else {
+        last_draw = null;
         $('#image_canvas').html('');
         $('#image_message').html('');
     }
@@ -20,7 +25,7 @@ function draw() {
          for(var i = 0; i < Math.min(gallery_stack.length, CACHE_SIZE); i++) {
              (function(tag) {
                   var m = tag.match(/<img src="([^"]*)"/);
-                  if(m.length == 2) {
+                  if(m && m.length == 2) {
                       cache.unshift(new Image());
                       cache[0].src = m[1];
                   }
