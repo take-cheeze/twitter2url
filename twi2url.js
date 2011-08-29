@@ -171,8 +171,7 @@ var twi2url = twi2url || {
                             url, get_og_description(data),
                             image_tag(get_og_image(data))
                         );
-                    }, error: error_callback
-                });
+                    }, error: error_callback});
         };
         var GALLERY_FILTER = {
             "^http://twitpic\\.com/([a-zA-Z0-9]+)$": function(url, callback) {
@@ -186,8 +185,7 @@ var twi2url = twi2url || {
                                 url + '/full', data.message,
                                 image_tag('http://twitpic.com/show/large/' + id)
                             );
-                        }, error: error_callback
-                    });
+                        }, error: error_callback});
             },
             "^http://yfrog.com/([a-z0-9]*)$": function(url, callback) {
                 $.ajax(
@@ -199,8 +197,7 @@ var twi2url = twi2url || {
                                 get_og_description(data),
                                 image_tag(get_og_image(data))
                             );
-                        }, error: error_callback
-                    });
+                        }, error: error_callback});
             },
             "^http://seiga.nicovideo.jp/seiga/im": og_callback,
             "^http://www.pixiv.net/member_illust.php": og_callback,
@@ -208,10 +205,11 @@ var twi2url = twi2url || {
             "^http://soundtracking.com/tracks/[a-z0-9]+$": og_callback,
             "^http://img.ly/[A-Za-z0-9]+$": og_callback,
             "^http://p.twipple.jp/[a-zA-Z0-9]+$": function(url, callback) {
-                var id = url.match(/'^http:\/\/p.twipple.jp\/([a-zA-Z0-9]*)$/)[1];
+                var id = url.match(/^http:\/\/p.twipple.jp\/([a-zA-Z0-9]*)$/)[1];
                 var photo_url = 'http://p.twipple.jp/data';
-                for(var i in id) { photo_url += '/' + id[i]; }
-                console.log(photo_url);
+                for(var i = 0; i < id.length; i++) { photo_url += '/' + id[i]; }
+                photo_url += '.jpg';
+                console.log('twipple photo url: ' + photo_url);
                 $.ajax(
                     {
                         'url': url, dataType: 'html',
@@ -241,19 +239,54 @@ var twi2url = twi2url || {
                     url + '/original', '',
                     image_tag('http://static.ow.ly/photos/normal/' + id + '.jpg'));
             },
+            '^http://www.youtube.com/watch\\?v=[a-zA-Z0-9]+': function(url, callback) {
+                $.ajax(
+                    {
+                        'url': 'http://www.youtube.com/oembed?url=' +
+                            encodeURIComponent(url) + '&format=json',
+                        dataType: 'json',
+                        success: function(data) {
+                            data.html = data.html.replace(
+                                /(src="[^"]+)"/, '$1&autoplay=1"');
+                            callback(url, '', data.html);
+                        }, error: error_callback});
+            },
+            '^http://vimeo.com/[0-9]+$': function(url, callback) {
+                $.ajax(
+                    {
+                        'url': 'http://vimeo.com/api/oembed.json?url=' +
+                            encodeURIComponent(url) + '&autoplay=1',
+                        dataType: 'json',
+                        success: function(data) {
+                            callback(url, '', data.html);
+                        }, error: error_callback});
+            },
+            '^http://www.slideshare.net/[^/]+/[^/]+$': function(url, callback) {
+                $.ajax(
+                    {
+                        'url': ' http://www.slideshare.net/api/oembed/2?url=' +
+                            encodeURIComponent(url) + '&format=json',
+                        dataType: 'json',
+                        success: function(data) {
+                            callback(url, '', data.html);
+                        }, error: error_callback});
+            },
+            '^http://www.nicovideo.jp/watch/[a-z0-9]+': function(url, callback) {
+                var id = url.match(/^http:\/\/www.nicovideo.jp\/watch\/([a-z0-9]+)/)[1];
+                callback(
+                    url, '', '<script type="text/javascript" src="http://ext.nicovideo.jp/thumb_watch/' +
+                        id + '"></script>');
+            },
             "^http://lockerz.com/s/[0-9]+$": function(url, callback) {
                 $.ajax(
                     {
                         'url': url, dataType: 'html',
                         success: function(data) {
-                            console.log(data.match(/<p>([^<]+)<\/p>/));
-                            console.log(data.match(/'<img id="photo" src="([^"]+)"'/));
                             callback(
                                 url, data.match(/<p>([^<]+)<\/p>/)[1],
-                                image_tag(data.match(/'<img id="photo" src="([^"]+)"'/)[1])
+                                image_tag(data.match(/<img id="photo" src="([^"]+)"/)[1])
                             );
-                        }, error: error_callback
-                    });
+                        }, error: error_callback});
             }
         };
         try {
@@ -362,6 +395,7 @@ var twi2url = twi2url || {
                                 (v.full_name in twi2url.since
                                  ? '&' + $.param({'since_id': twi2url.since[v.full_name]}) : ''),
                             function(data) {
+                                console.log(v.full_name + ' returned ' + data.length + 'tweets');
                                 twi2url.process_data(data);
                                 if(data.length > 0) {
                                     twi2url.since[v.full_name] = data[0].id_str;

@@ -28,7 +28,10 @@
         "http://seiga.nicovideo.jp/seiga/*",
         "http://soundtracking.com/tracks/*",
         "http://img.ly/*",
-        "http://lockerz.com/s/*"
+        "http://lockerz.com/s/*",
+        "http://www.youtube.com/oembed*",
+        "http://vimeo.com/api/oembed.json*",
+        "http://www.slideshare.net/api/oembed/2*"
     ],
     "options_page": "options.html"
 }
