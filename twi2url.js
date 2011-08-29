@@ -147,7 +147,7 @@ var twi2url = twi2url || {
         var error_callback = function(res) {
             twi2url.error(res);
             twi2url.urls.push(str);
-            throw new Error('match_gallery_filter error');
+            // throw new Error('match_gallery_filter error');
         };
         var get_og_image = function(data) {
             var m = data.match(/<meta property=["']og:image["'] content=["']([^'"]+)["']/);
@@ -161,7 +161,7 @@ var twi2url = twi2url || {
         };
         var image_tag = function(url) { return '<img src="' + url + '">'; };
         var image_file = function(url, callback)
-            { callback(url, '', image_tag(url)); };
+        { callback(url, '', image_tag(url)); };
         var og_callback = function(url, callback) {
             $.ajax(
                 {
@@ -208,9 +208,10 @@ var twi2url = twi2url || {
             "^http://soundtracking.com/tracks/[a-z0-9]+$": og_callback,
             "^http://img.ly/[A-Za-z0-9]+$": og_callback,
             "^http://p.twipple.jp/[a-zA-Z0-9]+$": function(url, callback) {
-                var id = url.replace(/'^http:\/\/p.twipple.jp\/([a-zA-Z0-9]*)$/, '$1');
+                var id = url.match(/'^http:\/\/p.twipple.jp\/([a-zA-Z0-9]*)$/)[1];
                 var photo_url = 'http://p.twipple.jp/data';
                 for(var i in id) { photo_url += '/' + id[i]; }
+                console.log(photo_url);
                 $.ajax(
                     {
                         'url': url, dataType: 'html',
@@ -245,6 +246,8 @@ var twi2url = twi2url || {
                     {
                         'url': url, dataType: 'html',
                         success: function(data) {
+                            console.log(data.match(/<p>([^<]+)<\/p>/));
+                            console.log(data.match(/'<img id="photo" src="([^"]+)"'/));
                             callback(
                                 url, data.match(/<p>([^<]+)<\/p>/)[1],
                                 image_tag(data.match(/'<img id="photo" src="([^"]+)"'/)[1])
@@ -272,7 +275,7 @@ var twi2url = twi2url || {
                 if(
                     (v in table) ||
                     twi2url.match_filter(v)
-                  ) { return; }
+                ) { return; }
 
                 if(twi2url.match_gallery_filter(
                        v, function(url, message, tag) {
@@ -334,7 +337,7 @@ var twi2url = twi2url || {
                             'include_rts': 'true'
                         }) +
                 ('home_timeline' in twi2url.since
-                ? '&' + $.param({'since_id': twi2url.since.home_timeline}) : ''),
+                 ? '&' + $.param({'since_id': twi2url.since.home_timeline}) : ''),
             function(data) {
                 twi2url.process_data(data);
                 if(data.length > 0) {
@@ -465,7 +468,7 @@ var twi2url = twi2url || {
                         text: twi2url.auto_open_state
                             ? twi2url.can_open_tab()
                             ? twi2url.auto_open_count.toString()
-                            : '+' + twi2url.auto_open_count.toString()
+                            : '+' + twi2url.urls.length.toString()
                         : twi2url.urls.length.toString()
                     }
                 );
