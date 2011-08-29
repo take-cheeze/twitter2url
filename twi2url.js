@@ -147,16 +147,21 @@ var twi2url = twi2url || {
         var error_callback = function(res) {
             twi2url.error(res);
             twi2url.urls.push(str);
-            // throw new Error('match_gallery_filter error');
         };
         var get_og_image = function(data) {
             var m = data.match(/<meta property=["']og:image["'] content=["']([^'"]+)["']/);
-            if(m.length != 2) { throw new Error('og:image parse error'); }
+            if(m.length != 2) {
+                error_callback(m);
+                throw new Error('og:image parse error');
+            }
             return m[1];
         };
         var get_og_description = function(data) {
             var m = data.match(/<meta property=["']og:description["'] content=["']([^'"]+)["']/);
-            if(m.length != 2) { throw new Error('og:description parse error'); }
+            if(m.length != 2) {
+                error_callback(m);
+                throw new Error('og:description parse error');
+            }
             return m[1];
         };
         var image_tag = function(url) { return '<img src="' + url + '">'; };
@@ -264,18 +269,28 @@ var twi2url = twi2url || {
             '^http://www.slideshare.net/[^/]+/[^/]+$': function(url, callback) {
                 $.ajax(
                     {
-                        'url': ' http://www.slideshare.net/api/oembed/2?url=' +
+                        'url': 'http://www.slideshare.net/api/oembed/2?url=' +
                             encodeURIComponent(url) + '&format=json',
                         dataType: 'json',
                         success: function(data) {
                             callback(url, '', data.html);
                         }, error: error_callback});
             },
+            '^http://flickr.net/photos/': function(url, callback) {
+                $.ajax(
+                    {
+                        'url': ' http://flickr.com/services/oembed?url=' +
+                            encodeURIComponent(url) + '&format=json',
+                        dataType: 'json',
+                        success: function(data) {
+                            callback(url, '', image_tag(data.url));
+                        }, error: error_callback});
+            },
             '^http://www.nicovideo.jp/watch/[a-z0-9]+': function(url, callback) {
                 var id = url.match(/^http:\/\/www.nicovideo.jp\/watch\/([a-z0-9]+)/)[1];
                 callback(
                     url, '', '<script type="text/javascript" src="http://ext.nicovideo.jp/thumb_watch/' +
-                        id + '"></script>');
+                        id + '" />');
             },
             "^http://lockerz.com/s/[0-9]+$": function(url, callback) {
                 $.ajax(
@@ -287,6 +302,10 @@ var twi2url = twi2url || {
                                 image_tag(data.match(/<img id="photo" src="([^"]+)"/)[1])
                             );
                         }, error: error_callback});
+            },
+            "^.*\\.pdf$": function(url, callback) {
+                twi2url.urls.push('https://docs.google.com/viewer?=url' +
+                                  + encodeURIComponent(url) + '&');
             }
         };
         try {

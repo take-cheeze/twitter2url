@@ -31,7 +31,8 @@
         "http://lockerz.com/s/*",
         "http://www.youtube.com/oembed*",
         "http://vimeo.com/api/oembed.json*",
-        "http://www.slideshare.net/api/oembed/2*"
+        "http://www.slideshare.net/api/oembed/2*",
+        "http://flickr.com/services/oembed*"
     ],
     "options_page": "options.html"
 }
