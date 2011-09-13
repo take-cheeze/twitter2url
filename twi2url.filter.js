@@ -11,9 +11,14 @@ twi2url.clean_urls = function() {
 
             if(!twi2url.match_gallery_filter(
                    v, function(url, message, tag) {
-                       var t = {
-                           'url': url, 'message': message, 'tag': tag };
-                       twi2url.gallery_stack.push(t);
+                       twi2url.in_history(
+                           url, function(exists) {
+                               if(exists) { return; }
+                               var t = {
+                                   'url': url, 'message': message, 'tag': tag
+                               };
+                               twi2url.gallery_stack.push(t);
+                           });
                    })) { result.push(v); }
             table[v] = '';
         }
