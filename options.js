@@ -1,17 +1,17 @@
-var filters = [];
+var exclude_filters = [];
 
-function add_filter() {
-    filters.push('');
-    draw_filter();
+function add_exclude_filter() {
+    exclude_filters.push('');
+    draw_exclude_filter();
 }
-function set_filter(index) {
-    filters[index] = $('#filter_' + index).val();
+function set_exclude_filter(index) {
+    exclude_filters[index] = $('#exclude_filter_' + index).val();
     changed(true);
 }
-function remove_filter(index) {
-    if(index < (filters.length - 1)) { filters.splice(index, 1); }
-    else if(index == (filters.length - 1)) { filters.pop(); }
-    draw_filter();
+function remove_exclude_filter(index) {
+    if(index < (exclude_filters.length - 1)) { exclude_filters.splice(index, 1); }
+    else if(index == (exclude_filters.length - 1)) { exclude_filters.pop(); }
+    draw_exclude_filter();
 }
 
 function get_background() { return chrome.extension.getBackgroundPage(); }
@@ -23,16 +23,16 @@ function save_options() {
     $.each(get_background().twi2url.defaults, function(k, v) {
                get_background().localStorage[k] = $("#" + k).val();
            });
-    get_background().localStorage.filters = JSON.stringify(filters);
-    get_background().twi2url.build_filters();
+    get_background().localStorage.exclude_filters = JSON.stringify(exclude_filters);
+    get_background().twi2url.update_options();
 
     restore_options();
 }
 
 function restore_options() {
     draw_options();
-    filters = JSON.parse(get_background().localStorage.filters);
-    draw_filter();
+    exclude_filters = JSON.parse(get_background().localStorage.exclude_filters);
+    draw_exclude_filter();
 
     changed(false);
 }
@@ -69,17 +69,17 @@ function draw_options() {
            });
 }
 
-function draw_filter() {
+function draw_exclude_filter() {
     var t = '';
     $.each(
-        filters, function(k, v) {
-            t += '<input type="text" id="filter_' + k + '" value="' + v + '" onchange="set_filter(' + k + ')" />' +
-                '<input type="button" onclick="remove_filter(' + k + ')" value="Remove Filter" />' +
+        exclude_filters, function(k, v) {
+            t += '<input type="text" id="exclude_filter_' + k + '" value="' + v + '" onchange="set_exclude_filter(' + k + ')" />' +
+                '<input type="button" onclick="remove_exclude_filter(' + k + ')" value="Remove Exclude_Filter" />' +
                 '<br>'
             ;
         }
     );
-    $('#filters').html(t);
+    $('#exclude_filters').html(t);
 
     changed(true);
 }
@@ -90,6 +90,6 @@ function set_default() {
             $('#' + k).val(v);
         }
     );
-    filters = [];
-    draw_filter();
+    exclude_filters = [];
+    draw_exclude_filter();
 }
