@@ -36,6 +36,7 @@ var twi2url = twi2url || {
     auto_open_count: 0,
     auto_fetch_timeout: null,
     auto_backup_timeout: null,
+    twitter_api_left: true,
     tab_ids: [], // list of auto opened tab id
 
     error: function(obj) {

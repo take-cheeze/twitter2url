@@ -7,9 +7,16 @@ twi2url.timeout_when_api_reset = function(callback) {
             } else {
                 var wait_time
                     = data.reset_time_in_seconds
-                    - ((new Data()).getTime() / 1000)
-                    + Math.ceil(Math.random() * 10); // add additional seconds
-                setTimeout(wait_time, callback);
+                    - Math.floor((new Date()).getTime() / 1000)
+                    + 1;
+                setTimeout(
+                    callback,
+                    (wait_time + Math.ceil(Math.random() * 10)) * 1000);
+                twi2url.twitter_api_left = false;
+                setTimeout(
+                    function() {
+                        twi2url.twitter_api_left = true;
+                    }, wait_time * 1000);
             }
         }, twi2url.error);
 };
@@ -19,10 +26,10 @@ twi2url.fetch_page = function(url, name, info) {
         info.page = 1;
         info.since_id =
             (name in twi2url.since)? twi2url.since[name] : null;
+        if(info.since_id !== null) {
+            url += '&' + $.param({'since_id': info.since_id});
+        }
         info.new_since_id = null;
-    }
-    if(info.since_id !== null) {
-        url += '&' + $.param({'since_id': info.since_id});
     }
     var process_data = function(data) {
         var expand_url = function(url, callback) {
@@ -64,12 +71,11 @@ twi2url.fetch_page = function(url, name, info) {
                     if(info.new_since_id === null && data.length > 0) {
                         info.new_since_id = data[0].id_str;
                     }
-                    console.log("tweet number: " + data.length);
                     if(((Math.ceil(data.length / 10) * 10) >= twi2url.TWEET_MAX) &&
                         (info.since_id !== null))
                     {
                         info.page++;
-                        fetch_page(url, name, info);
+                        twi2url.fetch_page(url, name, info);
                     } else {
                         twi2url.since[name] = info.new_since_id;
                     }
@@ -77,7 +83,7 @@ twi2url.fetch_page = function(url, name, info) {
         });
 };
 twi2url.fetch = function() {
-    if(!twi2url.is_signed_in()) { return; }
+    if(!twi2url.is_signed_in() || !twi2url.twitter_api_left) { return; }
 
     twi2url.timeout_when_api_reset(
         function() {
