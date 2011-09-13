@@ -66,7 +66,7 @@ twi2url.fetch_page = function(url, name, info) {
     twi2url.timeout_when_api_reset(
         function() {
             twi2url.oauth.getJSON(
-                url, function(data) {
+                url + '&' + $.param({page: info.page}), function(data) {
                     process_data(data);
                     if(info.new_since_id === null && data.length > 0) {
                         info.new_since_id = data[0].id_str;
