@@ -38,8 +38,6 @@ function restore_options() {
 }
 
 function changed(val) {
-    console.trace();
-
     val
         ? $('#save_button').removeAttr('disabled')
         : $('#save_button').attr('disabled', 'disabled')
@@ -74,7 +72,7 @@ function draw_exclude_filter() {
     $.each(
         exclude_filters, function(k, v) {
             t += '<input type="text" id="exclude_filter_' + k + '" value="' + v + '" onchange="set_exclude_filter(' + k + ')" />' +
-                '<input type="button" onclick="remove_exclude_filter(' + k + ')" value="Remove Exclude_Filter" />' +
+                '<input type="button" onclick="remove_exclude_filter(' + k + ')" value="Remove" />' +
                 '<br>'
             ;
         }
