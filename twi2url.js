@@ -1,4 +1,5 @@
 /*
+ localStorage.backup_freq - backup interval
  localStorage.check_freq - list check interval
  localStorage.exclude_filters - list of url filter regexp
  localStorage.open_tab_max - maximum of tab that will be opened at once
@@ -23,7 +24,7 @@ var twi2url = twi2url || {
 
     defaults: {
         auto_open_freq: 500, // milli-second
-        backup_freq: 1000 * 60 * 5, // 15 minutes
+        backup_freq: 1000 * 60 * 5, // 5 minutes
         check_freq: 1000 * 60 * 15, // 15 minutes
         open_tab_max: 10 // tabs
     },
@@ -99,11 +100,7 @@ var twi2url = twi2url || {
                 twi2url.exclude_filters.push(new RegExp(v));
             }
         );
-        // reset auto fetch timeout
-        clearTimeout(twi2url.auto_fetch_timeout);
         twi2url.timeout_auto_fetch();
-        // reset auto backup timeout
-        clearTimeout(twi2url.auto_backup_timeout);
         twi2url.timeout_auto_backup();
     }
 };

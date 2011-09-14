@@ -1,30 +1,3 @@
-twi2url.clean_urls = function() {
-    var table = {};
-    var result = [];
-
-    $.each(
-        twi2url.urls, function(k, v) {
-            if(
-                (v in table) ||
-                twi2url.match_exclude_filter(v)
-            ) { return; }
-
-            if(!twi2url.match_gallery_filter(
-                   v, function(url, message, tag) {
-                       twi2url.in_history(
-                           url, function(exists) {
-                               if(exists) { return; }
-                               var t = {
-                                   'url': url, 'message': message, 'tag': tag
-                               };
-                               twi2url.gallery_stack.push(t);
-                           });
-                   })) { result.push(v); }
-            table[v] = '';
-        }
-    );
-    twi2url.urls = result;
-};
 twi2url.match_exclude_filter = function(str) {
     if(str == null) return true;
     for(var i in twi2url.exclude_filters) {
