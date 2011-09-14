@@ -27,8 +27,8 @@ twi2url.clean_urls = function() {
 };
 twi2url.match_exclude_filter = function(str) {
     if(str == null) return true;
-    for(var i in twi2url.filters) {
-        if(twi2url.filters[i].test(str)) {
+    for(var i in twi2url.exclude_filters) {
+        if(twi2url.exclude_filters[i].test(str)) {
             // console.log("Filtered URL: " + str);
             return true;
         }
@@ -66,7 +66,7 @@ twi2url.match_gallery_filter = function(str, callback) {
             error_callback(m);
             throw new Error('og:description parse error');
         }
-        return m[1];
+        return unescape(m[1]);
     };
     var image_tag = function(url) { return '<img src="' + url + '">'; };
     var image_file = function(url, callback)
