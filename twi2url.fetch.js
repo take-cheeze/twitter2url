@@ -119,13 +119,11 @@ twi2url.fetch = function() {
                 }, twi2url.error
             );
         });
+
+    twi2url.update_options();
 };
 twi2url.timeout_auto_fetch = function() {
     twi2url.auto_fetch_timeout =
-        setTimeout(twi2url.auto_fetch,
+        setTimeout(twi2url.fetch,
                    parseInt(localStorage.check_freq));
-};
-twi2url.auto_fetch = function() {
-    twi2url.fetch();
-    twi2url.timeout_auto_fetch();
 };
