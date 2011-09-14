@@ -1,6 +1,6 @@
 {
     "name": "twi2url",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "Collect url from your twitter.",
 
     "background_page": "background.html",
