@@ -181,7 +181,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                         callback(url, '', data.html);
                     }, error: error_callback});
         },
-        '^http://www.flickr.net/photos/': function(url, callback) {
+        '^http://www.flickr.com/photos/': function(url, callback) {
             $.ajax(
                 {
                     'url': 'http://flickr.com/services/oembed?url=' +
