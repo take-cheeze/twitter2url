@@ -71,10 +71,12 @@ twi2url.fetch_page = function(url, name, info) {
                     if(info.new_since_id === null && data.length > 0) {
                         info.new_since_id = data[0].id_str;
                     }
+                    console.log('fetched tweet number: ' + data.length);
                     if(((Math.ceil(data.length / 10) * 10) >= twi2url.TWEET_MAX) &&
                         (info.since_id !== null))
                     {
                         info.page++;
+                        console.log('next page: ' + info.page);
                         twi2url.fetch_page(url, name, info);
                     } else {
                         twi2url.since[name] = info.new_since_id;

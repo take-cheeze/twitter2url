@@ -29,7 +29,6 @@ twi2url.match_exclude_filter = function(str) {
     if(str == null) return true;
     for(var i in twi2url.exclude_filters) {
         if(twi2url.exclude_filters[i].test(str)) {
-            // console.log("Filtered URL: " + str);
             return true;
         }
     }
@@ -118,7 +117,6 @@ twi2url.match_gallery_filter = function(str, callback) {
             var photo_url = 'http://p.twipple.jp/data';
             for(var i = 0; i < id.length; i++) { photo_url += '/' + id[i]; }
             photo_url += '.jpg';
-            console.log('twipple photo url: ' + photo_url);
             $.ajax(
                 {
                     'url': url, dataType: 'html',

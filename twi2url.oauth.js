@@ -40,7 +40,6 @@ twi2url.signin = function() {
             twi2url.oauth.fetchAccessToken(
                 function(data) {
                     var q = $.query.load('?' + data.text);
-                    // console.log(q.toString());
                     $.each(
                         twi2url.LOCAL_STORAGE_KEY,
                         function(k, v) {

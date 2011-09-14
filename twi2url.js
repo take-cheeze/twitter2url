@@ -57,7 +57,6 @@ var twi2url = twi2url || {
             });
     },
     in_history: function(url, callback) {
-        // console.log("Searching: " + url);
         chrome.history.getVisits(
             {'url': url}, function(results) {
                 callback(results.length != 0);
