@@ -76,7 +76,7 @@ twi2url.fetch_page = function(url, name, info) {
                     {
                         info.page++;
                         twi2url.fetch_page(url, name, info);
-                    } else {
+                    } else if(info.new_since_id !== null) {
                         twi2url.since[name] = info.new_since_id;
                     }
                 }, twi2url.error);
