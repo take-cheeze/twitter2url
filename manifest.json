@@ -1,6 +1,6 @@
 {
     "name": "twi2url",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Collect url from your twitter.",
 
     "background_page": "background.html",
@@ -29,10 +29,16 @@
         "http://soundtracking.com/tracks/*",
         "http://img.ly/*",
         "http://lockerz.com/s/*",
+        "http://api.photozou.jp/rest/photo_info*",
+        "http://pikubo.jp/photo/*",
+        "http://picplz.com/user/*",
+        "http://www.mobypicture.com/user/*",
+        "http://english.aljazeera.net/*",
         "http://www.youtube.com/oembed*",
         "http://vimeo.com/api/oembed.json*",
         "http://www.slideshare.net/api/oembed/2*",
-        "http://flickr.com/services/oembed*"
+        "http://flickr.com/services/oembed*",
+        "http://soundcloud.com/oembed*"
     ],
     "options_page": "options.html"
 }
