@@ -25,7 +25,7 @@ twi2url.match_gallery_filter = function(str, callback) {
         twi2url.urls.push(str);
     };
     var get_og_image = function(data) {
-        var m = data.match(/<meta property=["']og:image["'] content=["']([^'"]+)["']/g);
+        var m = data.match(/<meta property=["']og:image["'] content=["']([^'"]+)["']/);
         if(m.length != 2) {
             error_callback(m);
             throw new Error('og:image parse error');
@@ -33,7 +33,7 @@ twi2url.match_gallery_filter = function(str, callback) {
         return m[1];
     };
     var get_og_description = function(data) {
-        var m = data.match(/<meta property=["']og:description["'] content=["']([^'"]+)["']/g);
+        var m = data.match(/<meta property=["']og:description["'] content=["']([^'"]+)["']/);
         if(m.length != 2) {
             error_callback(m);
             throw new Error('og:description parse error');
@@ -41,7 +41,7 @@ twi2url.match_gallery_filter = function(str, callback) {
         return unescape(m[1]);
     };
     var get_og_title = function(data) {
-        var m = data.match(/<meta property=["']og:title["'] content=["']([^'"]+)["']/g);
+        var m = data.match(/<meta property=["']og:title["'] content=["']([^'"]+)["']/);
         if(m.length != 2) {
             error_callback(m);
             throw new Error('og:title parse error');
@@ -76,7 +76,7 @@ twi2url.match_gallery_filter = function(str, callback) {
             });
     };
     var GALLERY_FILTER = {
-        '^http://pikubo.jp/photo/[a-zA-Z_0-9]+$': og_callback_title,
+        '^http://pikubo.jp/photo/[a-zA-Z_0-9\\-]+$': og_callback_title,
         '^http://picplz.com/user/[a-zA-Z0-9_]+/pic/[a-zA-Z_0-9]+/$': og_callback_title,
         '^http://www.mobypicture.com/user/[a-zA-Z0-9_]+/view/[0-9]+': og_callback_title,
         '^http://yfrog.com/([a-z0-9]*)$': og_callback_title,
@@ -223,8 +223,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }, error: error_callback});
         },
         "^.*\\.pdf$": function(url, callback) {
-            twi2url.urls.push('https://docs.google.com/viewer?=url' +
-                              + encodeURIComponent(url) + '&');
+            twi2url.urls.push('https://docs.google.com/viewer?=url'
+                              + encodeURIComponent(url));
         }
     };
     try {
