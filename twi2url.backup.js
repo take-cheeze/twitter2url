@@ -1,7 +1,8 @@
 twi2url.backup = function() {
     $.each(
-        ['since', 'urls', 'gallery_stack'], function(index, value) {
-            localStorage[value] = JSON.stringify(twi2url[value]);
+        ['since', 'urls', 'gallery_stack'], function(k, v) {
+            localStorage.removeItem(v);
+            localStorage.setItem(v, JSON.stringify(twi2url[v]));
         }
     );
     twi2url.clean_urls();
