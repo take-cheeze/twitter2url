@@ -90,6 +90,9 @@ twi2url.match_gallery_filter = function(str, callback) {
                 }, error: error_callback
             });
     };
+    var oembed_image_callback = function(data) {
+        callback(url, data.title, image_tag(data.url));
+    };
     var GALLERY_FILTER = {
         '^http://pikubo.jp/photo/[a-zA-Z_0-9\\-]+$': og_callback_title,
         '^http://picplz.com/user/[a-zA-Z0-9_]+/pic/[a-zA-Z_0-9]+/$': og_callback_title,
@@ -173,34 +176,41 @@ twi2url.match_gallery_filter = function(str, callback) {
                        callback(url, data.title, data.html);
                    });
         },
+        '[a-z]+.wordpress.com/.+': function(url, callback) {
+            oembed('http://public-api.wordpress.com/oembed/1.0/?' +
+                       $.param({
+                                   'for': 'twi2url',
+                                   format: 'json',
+                                   'url': url
+                               }),
+                   callback,
+                   function(data) { callback(url, data.title, data.html); });
+        },
         '^http://vimeo.com/[0-9]+$': function(url, callback) {
             oembed('http://vimeo.com/api/oembed.json?url=' +
                    encodeURIComponent(url) + '&autoplay=1', callback);
         },
         '^http://soundcloud.com/.+/.+$': function(url, callback) {
-            oembed('http://vimeo.com/api/oembed?url=' +
-                   encodeURIComponent(url) + '&format=json&autoplay=1', callback);
+            oembed('http://soundcloud.com/oembed?url=' +
+                   encodeURIComponent(url) + '&format=json&autoplay=true', callback);
         },
         '^http://www.slideshare.net/[^/]+/[^/]+$': function(url, callback) {
             oembed('http://www.slideshare.net/api/oembed/2?url=' +
                    encodeURIComponent(url) + '&format=json', callback,
-                   function(data) {
-                       callback(url, data.title, data.html);
-                   });
+                   function(data) { callback(url, data.title, data.html); });
         },
         "^http://instagr.am/p/[\\-_a-zA-Z0-9]+/?$": function(url, callback) {
             oembed('http://api.instagram.com/oembed?url=' +
-                   encodeURIComponent(url), callback,
-                   function(data) {
-                       callback(url, data.title, image_tag(data.url));
-                   });
+                   encodeURIComponent(url), callback, oembed_image_callback);
+        },
+        "^http://.+\\.deviantart/art/.+$": function(url, callback) {
+            oembed('http://backend.deviantart.com/oembed?url=' +
+                   encodeURIComponent(url), callback, oembed_image_callback);
         },
         '^http://www.flickr.com/photos/': function(url, callback) {
             oembed('http://flickr.com/services/oembed?url=' +
-                   encodeURIComponent(url) + '&format=json', callback,
-                   function(data) {
-                       callback(url, data.title, image_tag(data.url));
-                   });
+                   encodeURIComponent(url) + '&format=json',
+                   callback, oembed_image_callback);
         },
         '^http://www.nicovideo.jp/watch/[a-z0-9]+': function(url, callback) {
             callback(url, '', '<a rel="video" href="' + url + '" />');

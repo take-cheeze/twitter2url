@@ -38,7 +38,9 @@
         "http://www.slideshare.net/api/oembed/2*",
         "http://flickr.com/services/oembed*",
         "http://soundcloud.com/oembed*",
-        "http://api.instagram.com/oembed"
+        "http://api.instagram.com/oembed",
+        "http://public-api.wordpress.com/oembed/1.0/*",
+        "http://backend.deviantart.com/oembed*"
     ],
     "options_page": "options.html"
 }
