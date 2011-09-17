@@ -127,7 +127,6 @@ twi2url.match_gallery_filter = function(str, callback) {
         "^http://english.aljazeera.net/.+": og_callback,
         "^http://seiga.nicovideo.jp/seiga/im": og_callback,
         "^http://www.pixiv.net/member_illust.php": og_callback,
-        "^http://instagr.am/p/[\\-_a-zA-Z0-9]+/?$": og_callback,
         "^http://soundtracking.com/tracks/[a-z0-9]+$": og_callback,
         "^http://img.ly/[A-Za-z0-9]+$": og_callback,
         "^http://p.twipple.jp/[a-zA-Z0-9]+$": function(url, callback) {
@@ -187,6 +186,13 @@ twi2url.match_gallery_filter = function(str, callback) {
                    encodeURIComponent(url) + '&format=json', callback,
                    function(data) {
                        callback(url, data.title, data.html);
+                   });
+        },
+        "^http://instagr.am/p/[\\-_a-zA-Z0-9]+/?$": function(url, callback) {
+            oembed('http://api.instagram.com/oembed?url=' +
+                   encodeURIComponent(url), callback,
+                   function(data) {
+                       callback(url, data.title, image_tag(data.url));
                    });
         },
         '^http://www.flickr.com/photos/': function(url, callback) {
