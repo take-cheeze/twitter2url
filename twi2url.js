@@ -150,4 +150,5 @@ $(function() {
                       }
                   });
           });
+      window.onunload = function() { twi2url.backup(); };
   });
