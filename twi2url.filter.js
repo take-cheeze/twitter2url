@@ -75,6 +75,21 @@ twi2url.match_gallery_filter = function(str, callback) {
                 }, error: error_callback
             });
     };
+    var google_docs_viewer = function(url, callback) {
+        twi2url.urls.push('https://docs.google.com/viewer?url='
+                          + encodeURIComponent(url));
+    };
+    var oembed = function(url, default_callback, oembed_callback) {
+        $.ajax(
+            {
+                'url': url, dataType: 'json',
+                success: function(data) {
+                    if(oembed_callback === undefined) {
+                        default_callback(url, data.description, data.html);
+                    } else { oembed_callback(data); }
+                }, error: error_callback
+            });
+    };
     var GALLERY_FILTER = {
         '^http://pikubo.jp/photo/[a-zA-Z_0-9\\-]+$': og_callback_title,
         '^http://picplz.com/user/[a-zA-Z0-9_]+/pic/[a-zA-Z_0-9]+/$': og_callback_title,
@@ -139,7 +154,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                     url.replace(
                             /http:\/\/movapic.com\/pic\/([a-z0-9]+)/,
                         'http://image.movapic.com/pic/m_$1.jpeg'
-                    ) + '.jpeg'));
+                    )));
         },
         '^http://gyazo.com/[a-z0-9]+$': function(url, callback) {
             callback(url, '', image_tag(url + '.png'));
@@ -151,56 +166,35 @@ twi2url.match_gallery_filter = function(str, callback) {
                 image_tag('http://static.ow.ly/photos/normal/' + id + '.jpg'));
         },
         '^http://www.youtube.com/watch\\?v=[a-zA-Z0-9]+': function(url, callback) {
-            $.ajax(
-                {
-                    'url': 'http://www.youtube.com/oembed?url=' +
-                        encodeURIComponent(url) + '&format=json',
-                    dataType: 'json',
-                    success: function(data) {
-                        data.html = data.html.replace(
-                                /(src="[^"]+)"/, '$1&autoplay=1"');
-                        callback(url, data.title, data.html);
-                    }, error: error_callback});
+            oembed('http://www.youtube.com/oembed?url=' +
+                   encodeURIComponent(url) + '&format=json', callback,
+                   function(data) {
+                       data.html = data.html.replace(
+                               /(src="[^"]+)"/, '$1&autoplay=1"');
+                       callback(url, data.title, data.html);
+                   });
         },
         '^http://vimeo.com/[0-9]+$': function(url, callback) {
-            $.ajax(
-                {
-                    'url': 'http://vimeo.com/api/oembed.json?url=' +
-                        encodeURIComponent(url) + '&autoplay=1',
-                    dataType: 'json',
-                    success: function(data) {
-                        callback(url, data.description, data.html);
-                    }, error: error_callback});
+            oembed('http://vimeo.com/api/oembed.json?url=' +
+                   encodeURIComponent(url) + '&autoplay=1', callback);
         },
         '^http://soundcloud.com/.+/.+$': function(url, callback) {
-            $.ajax(
-                {
-                    'url': 'http://vimeo.com/api/oembed?url=' +
-                        encodeURIComponent(url) + '&format=json&autoplay=1',
-                    dataType: 'json',
-                    success: function(data) {
-                        callback(url, data.description, data.html);
-                    }, error: error_callback});
+            oembed('http://vimeo.com/api/oembed?url=' +
+                   encodeURIComponent(url) + '&format=json&autoplay=1', callback);
         },
         '^http://www.slideshare.net/[^/]+/[^/]+$': function(url, callback) {
-            $.ajax(
-                {
-                    'url': 'http://www.slideshare.net/api/oembed/2?url=' +
-                        encodeURIComponent(url) + '&format=json',
-                    dataType: 'json',
-                    success: function(data) {
-                        callback(url, data.title, data.html);
-                    }, error: error_callback});
+            oembed('http://www.slideshare.net/api/oembed/2?url=' +
+                   encodeURIComponent(url) + '&format=json', callback,
+                   function(data) {
+                       callback(url, data.title, data.html);
+                   });
         },
         '^http://www.flickr.com/photos/': function(url, callback) {
-            $.ajax(
-                {
-                    'url': 'http://flickr.com/services/oembed?url=' +
-                        encodeURIComponent(url) + '&format=json',
-                    dataType: 'json',
-                    success: function(data) {
-                        callback(url, data.title, image_tag(data.url));
-                    }, error: error_callback});
+            oembed('http://flickr.com/services/oembed?url=' +
+                   encodeURIComponent(url) + '&format=json', callback,
+                   function(data) {
+                       callback(url, data.title, image_tag(data.url));
+                   });
         },
         '^http://www.nicovideo.jp/watch/[a-z0-9]+': function(url, callback) {
             callback(url, '', '<a rel="video" href="' + url + '" />');
@@ -222,10 +216,18 @@ twi2url.match_gallery_filter = function(str, callback) {
                         );
                     }, error: error_callback});
         },
-        "^.*\\.pdf$": function(url, callback) {
-            twi2url.urls.push('https://docs.google.com/viewer?=url'
-                              + encodeURIComponent(url));
-        }
+        "^.*\\.docx?$": google_docs_viewer,
+        "^.*\\.xlsx?$": google_docs_viewer,
+        "^.*\\.pptx?$": google_docs_viewer,
+        "^.*\\.pages$": google_docs_viewer,
+        "^.*\\.ttf$": google_docs_viewer,
+        "^.*\\.psd$": google_docs_viewer,
+        "^.*\\.ai$": google_docs_viewer,
+        "^.*\\.tiff$": google_docs_viewer,
+        "^.*\\.dxf$": google_docs_viewer,
+        "^.*\\.svg$": google_docs_viewer,
+        "^.*\\.xps$": google_docs_viewer,
+        "^.*\\.pdf$": google_docs_viewer
     };
     try {
         for(var k in GALLERY_FILTER) {
