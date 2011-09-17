@@ -53,7 +53,7 @@ var twi2url = twi2url || {
                         'selected': selected,
                         'url': url
                     }, function(tab) {
-                        if(callback) { callback(tab); }
+                        if(callback !== undefined) { callback(tab); }
                     });
             });
     },
@@ -65,8 +65,10 @@ var twi2url = twi2url || {
         );
     },
     can_open_tab: function() {
-        return(twi2url.auto_open_count <
-               parseInt(localStorage.open_tab_max));
+        return(
+            (twi2url.auto_open_count < parseInt(localStorage.open_tab_max)) &&
+                (twi2url.urls.length > 0)
+        );
     },
     auto_open: function(enable) {
         if(enable != undefined) { twi2url.auto_open_state = enable; }
@@ -141,12 +143,12 @@ $(function() {
       chrome.tabs.onRemoved.addListener( // tab remove event
           function(tab_id, remove_info) {
               $.each(
-                  twi2url.tab_ids, function(key, value) {
-                      if(value == tab_id) {
+                  twi2url.tab_ids, function(k, v) {
+                      if(v === tab_id) {
                           if(twi2url.auto_open_count > 0) {
                               twi2url.auto_open_count--;
                           }
-                          twi2url.tab_ids.splice(key, 1);
+                          twi2url.tab_ids.splice(k, 1);
                       }
                   });
           });
