@@ -36,10 +36,9 @@ twi2url.fetch_page = function(url, name, info) {
             if(url.length < twi2url.EXPANDING_URL_LENGTH_MAX) {
                 $.ajax(
                     {
-                        type: "GET",
-                        url: 'http://api.longurl.org/v2/expand?format=json&' +
-                            $.param({'url': url}),
-                                         dataType: 'json',
+                        url: 'http://api.longurl.org/v2/expand?' +
+                            $.param({'url': url, format: 'json'}),
+                        dataType: 'json',
                         success: function(data) {
                             callback(data['long-url']);
                         },

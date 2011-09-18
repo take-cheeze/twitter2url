@@ -21,7 +21,7 @@ function save_options() {
      TODO: check values
      */
     $.each(get_background().twi2url.defaults, function(k, v) {
-               get_background().localStorage[k] = $("#" + k).val();
+               get_background().localStorage[k] = $('#' + k).val();
            });
     get_background().localStorage.exclude_filters = JSON.stringify(exclude_filters);
     get_background().twi2url.update_options();
@@ -63,7 +63,7 @@ function draw_options() {
     $('#options').html(t);
 
     $.each(get_background().twi2url.defaults, function(k, v) {
-               $("#" + k).val(get_background().localStorage[k]);
+               $('#' + k).val(get_background().localStorage[k]);
            });
 }
 

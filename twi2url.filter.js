@@ -76,8 +76,8 @@ twi2url.match_gallery_filter = function(str, callback) {
             });
     };
     var google_docs_viewer = function(url, callback) {
-        twi2url.urls.push('https://docs.google.com/viewer?url='
-                          + encodeURIComponent(url));
+        twi2url.urls.push('https://docs.google.com/viewer?' +
+                          $.param({'url': encodeURIComponent(url)}));
     };
     var oembed = function(url, default_callback, oembed_callback) {
         $.ajax(
@@ -94,12 +94,8 @@ twi2url.match_gallery_filter = function(str, callback) {
         callback(url, data.title, image_tag(data.url));
     };
     var GALLERY_FILTER = {
-        '^http://pikubo.jp/photo/[a-zA-Z_0-9\\-]+$': og_callback_title,
-        '^http://picplz.com/user/[a-zA-Z0-9_]+/pic/[a-zA-Z_0-9]+/$': og_callback_title,
-        '^http://www.mobypicture.com/user/[a-zA-Z0-9_]+/view/[0-9]+': og_callback_title,
-        '^http://yfrog.com/([a-z0-9]*)$': og_callback_title,
-        '^http://photozou.jp/photo/show/([0-9]+)/([0-9]+)$': function(url, callback) {
-            var id = url.match(/http:\/\/photozou.jp\/photo\/show\/([0-9]+)\/([0-9]+)/)[2];
+        '^http://photozou.jp/photo/show/(\\d+)/(\\d+)$': function(url, callback) {
+            var id = url.match(/^http:\/\/photozou.jp\/photo\/show\/(\d+)\/(\d+)/)[2];
             $.ajax(
                 {
                     'url': 'http://api.photozou.jp/rest/photo_info?'
@@ -113,11 +109,12 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }, error: error_callback
                 });
         },
-        '^http://twitpic\\.com/([a-zA-Z0-9]+)$': function(url, callback) {
-            var id = url.match(/^http:\/\/twitpic.com\/([a-zA-Z0-9]+)$/)[1];
+        '^http://twitpic\\.com/(\\w+)$': function(url, callback) {
+            var id = url.match(/^http:\/\/twitpic.com\/(\w+)$/)[1];
             $.ajax(
                 {
-                    'url': 'http://api.twitpic.com/2/media/show.json?id=' + id,
+                    'url': 'http://api.twitpic.com/2/media/show.json?' +
+                        $.param({'id': id}),
                     dataType: 'json',
                     success: function(data) {
                         callback(
@@ -127,13 +124,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }, error: error_callback
                 });
         },
-        "^http://english.aljazeera.net/.+": og_callback,
-        "^http://seiga.nicovideo.jp/seiga/im": og_callback,
-        "^http://www.pixiv.net/member_illust.php": og_callback,
-        "^http://soundtracking.com/tracks/[a-z0-9]+$": og_callback,
-        "^http://img.ly/[A-Za-z0-9]+$": og_callback,
-        "^http://p.twipple.jp/[a-zA-Z0-9]+$": function(url, callback) {
-            var id = url.match(/^http:\/\/p.twipple.jp\/([a-zA-Z0-9]*)$/)[1];
+        '^http://p.twipple.jp/\\w+$': function(url, callback) {
+            var id = url.match(/^http:\/\/p.twipple.jp\/(\w+)$/)[1];
             var photo_url = 'http://p.twipple.jp/data';
             for(var i = 0; i < id.length; i++) { photo_url += '/' + id[i]; }
             photo_url += '.jpg';
@@ -147,81 +139,78 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }, error: error_callback
                 });
         },
-        '^.+\\.png$': image_file, '^.+\\.JPG$': image_file,
-        '^.+\\.jpg$': image_file, '^.+\\.gif$': image_file,
-        '^.+\\.jpeg$': image_file,
-        '^http://movapic.com/pic/[a-z0-9]+$': function(url, callback) {
+        '^http://movapic.com/pic/\\w+$': function(url, callback) {
             callback(
                 url, '', image_tag(
                     url.replace(
-                            /http:\/\/movapic.com\/pic\/([a-z0-9]+)/,
-                        'http://image.movapic.com/pic/m_$1.jpeg'
-                    )));
+                            /http:\/\/movapic.com\/pic\/(\w+)/,
+                        'http://image.movapic.com/pic/m_$1.jpeg')));
         },
-        '^http://gyazo.com/[a-z0-9]+$': function(url, callback) {
+        '^http://gyazo.com/\\w+$': function(url, callback) {
             callback(url, '', image_tag(url + '.png'));
         },
-        "^http://ow.ly/i/[a-zA-Z0-9]+$": function(url, callback) {
-            var id = url.match(/^http:\/\/ow.ly\/i\/([a-zA-Z0-9]+)$/)[1];
+        '^http://ow.ly/i/\\w+$': function(url, callback) {
+            var id = url.match(/^http:\/\/ow.ly\/i\/(\w+)$/)[1];
             callback(
                 url + '/original', '',
                 image_tag('http://static.ow.ly/photos/normal/' + id + '.jpg'));
         },
-        '^http://www.youtube.com/watch\\?v=[a-zA-Z0-9]+': function(url, callback) {
-            oembed('http://www.youtube.com/oembed?url=' +
-                   encodeURIComponent(url) + '&format=json', callback,
-                   function(data) {
+        '^http://www.youtube.com/watch\\?v=\\w+': function(url, callback) {
+            oembed('http://www.youtube.com/oembed?' +
+                   $.param({'url': encodeURIComponent(url), format: 'json'}),
+                   callback, function(data) {
                        data.html = data.html.replace(
                                /(src="[^"]+)"/, '$1&autoplay=1"');
                        callback(url, data.title, data.html);
                    });
         },
-        '[a-z]+.wordpress.com/.+': function(url, callback) {
+        '\\w+.wordpress.com/.+': function(url, callback) {
             oembed('http://public-api.wordpress.com/oembed/1.0/?' +
-                       $.param({
-                                   'for': 'twi2url',
-                                   format: 'json',
-                                   'url': url
-                               }),
+                   $.param({'for': 'twi2url', format: 'json', 'url': url}),
                    callback,
                    function(data) { callback(url, data.title, data.html); });
         },
-        '^http://vimeo.com/[0-9]+$': function(url, callback) {
-            oembed('http://vimeo.com/api/oembed.json?url=' +
-                   encodeURIComponent(url) + '&autoplay=1', callback);
+        '^http://vimeo.com/\\d+$': function(url, callback) {
+            oembed('http://vimeo.com/api/oembed.json?' +
+                   $.param({'url': encodeURIComponent(url), autoplay: true}),
+                   callback);
         },
         '^http://soundcloud.com/.+/.+$': function(url, callback) {
-            oembed('http://soundcloud.com/oembed?url=' +
-                   encodeURIComponent(url) + '&format=json&autoplay=true', callback);
+            oembed('http://soundcloud.com/oembed?' +
+                   $.param({'url': encodeURIComponent(url),
+                            format: 'json', autoplay: true}), callback);
         },
         '^http://www.slideshare.net/[^/]+/[^/]+$': function(url, callback) {
-            oembed('http://www.slideshare.net/api/oembed/2?url=' +
-                   encodeURIComponent(url) + '&format=json', callback,
+            oembed('http://www.slideshare.net/api/oembed/2?' +
+                   $.param({'url': encodeURIComponent(url), format: 'json'}),
+                   callback,
                    function(data) { callback(url, data.title, data.html); });
         },
-        "^http://instagr.am/p/[\\-_a-zA-Z0-9]+/?$": function(url, callback) {
-            oembed('http://api.instagram.com/oembed?url=' +
-                   encodeURIComponent(url), callback, oembed_image_callback);
-        },
-        "^http://.+\\.deviantart/art/.+$": function(url, callback) {
-            oembed('http://backend.deviantart.com/oembed?url=' +
-                   encodeURIComponent(url), callback, oembed_image_callback);
-        },
-        '^http://www.flickr.com/photos/': function(url, callback) {
-            oembed('http://flickr.com/services/oembed?url=' +
-                   encodeURIComponent(url) + '&format=json',
+        '^http://instagr.am/p/[\\-\\w]+/?$': function(url, callback) {
+            oembed('http://api.instagram.com/oembed?' +
+                   $.param({'url': encodeURIComponent(url)}),
                    callback, oembed_image_callback);
         },
-        '^http://www.nicovideo.jp/watch/[a-z0-9]+': function(url, callback) {
+        '^http://.+\\.deviantart/art/.+$': function(url, callback) {
+            oembed('http://backend.deviantart.com/oembed?' +
+                   $.param({'url': encodeURIComponent(url)}),
+                   callback, oembed_image_callback);
+        },
+        '^http://www.flickr.com/photos/': function(url, callback) {
+            oembed('http://flickr.com/services/oembed?' +
+                   $.param({'url': encodeURIComponent(url), format: 'json'}),
+                   callback, oembed_image_callback);
+        },
+        '^http://www.nicovideo.jp/watch/\\w+': function(url, callback) {
             callback(url, '', '<a rel="video" href="' + url + '" />');
             /*
-            var id = url.match(/^http:\/\/www.nicovideo.jp\/watch\/([a-z0-9]+)/)[1];
+            var id = url.match(/^http:\/\/www.nicovideo.jp\/watch\/(\w+)/)[1];
             callback(
                 url, '', '<script type="text/javascript" src="http://ext.nicovideo.jp/thumb_watch/' +
                     id + '"></script>');
              */
         },
-        "^http://lockerz.com/s/[0-9]+$": function(url, callback) {
+        '^http://lockerz.com/s/\\d+$': function(url, callback) {
             $.ajax(
                 {
                     'url': url, dataType: 'html',
@@ -230,20 +219,37 @@ twi2url.match_gallery_filter = function(str, callback) {
                             url, data.match(/<p>([^<]+)<\/p>/)[1],
                             image_tag(data.match(/<img id="photo" src="([^"]+)"/)[1])
                         );
-                    }, error: error_callback});
+                    }, error: error_callback
+                });
         },
-        "^.*\\.docx?$": google_docs_viewer,
-        "^.*\\.xlsx?$": google_docs_viewer,
-        "^.*\\.pptx?$": google_docs_viewer,
-        "^.*\\.pages$": google_docs_viewer,
-        "^.*\\.ttf$": google_docs_viewer,
-        "^.*\\.psd$": google_docs_viewer,
-        "^.*\\.ai$": google_docs_viewer,
-        "^.*\\.tiff$": google_docs_viewer,
-        "^.*\\.dxf$": google_docs_viewer,
-        "^.*\\.svg$": google_docs_viewer,
-        "^.*\\.xps$": google_docs_viewer,
-        "^.*\\.pdf$": google_docs_viewer
+        // image file
+        '^.+\\.png$': image_file, '^.+\\.JPG$': image_file,
+        '^.+\\.jpg$': image_file, '^.+\\.gif$': image_file,
+        '^.+\\.jpeg$': image_file,
+        // google docs
+        '^http://.*\\.docx?$': google_docs_viewer,
+        '^http://.*\\.xlsx?$': google_docs_viewer,
+        '^http://.*\\.pptx?$': google_docs_viewer,
+        '^http://.*\\.pages$': google_docs_viewer,
+        '^http://.*\\.ttf$': google_docs_viewer,
+        '^http://.*\\.psd$': google_docs_viewer,
+        '^http://.*\\.ai$': google_docs_viewer,
+        '^http://.*\\.tiff$': google_docs_viewer,
+        '^http://.*\\.dxf$': google_docs_viewer,
+        '^http://.*\\.svg$': google_docs_viewer,
+        '^http://.*\\.xps$': google_docs_viewer,
+        '^http://.*\\.pdf$': google_docs_viewer,
+        // open graph
+        '^http://english.aljazeera.net/.+': og_callback,
+        '^http://seiga.nicovideo.jp/seiga/im': og_callback,
+        '^http://www.pixiv.net/member_illust.php': og_callback,
+        '^http://soundtracking.com/tracks/\\w+$': og_callback,
+        '^http://img.ly/\\w+$': og_callback,
+        // open graph that use title as message
+        '^http://pikubo.jp/photo/[\\w\\-]+$': og_callback_title,
+        '^http://picplz.com/user/\\w+/pic/\\w+/$': og_callback_title,
+        '^http://www.mobypicture.com/user/\\w+/view/\\d+': og_callback_title,
+        '^http://yfrog.com/(\\w*)$': og_callback_title
     };
     try {
         for(var k in GALLERY_FILTER) {

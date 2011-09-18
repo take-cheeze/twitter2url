@@ -67,8 +67,7 @@ var twi2url = twi2url || {
     can_open_tab: function() {
         return(
             (twi2url.auto_open_count < parseInt(localStorage.open_tab_max)) &&
-                (twi2url.urls.length > 0)
-        );
+                (twi2url.urls.length > 0));
     },
     auto_open: function(enable) {
         if(enable != undefined) { twi2url.auto_open_state = enable; }

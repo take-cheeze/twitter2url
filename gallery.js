@@ -12,7 +12,7 @@ function draw() {
             $('#url_bar').html(current.url);
             $('#canvas').html(current.tag);
             $('#message').html(current.message);
-	        $("a[rel=video]").createVideo();
+	        $('a[rel=video]').createVideo();
             last_draw = current;
         }
     } else {
