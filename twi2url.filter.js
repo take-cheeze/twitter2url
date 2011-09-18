@@ -90,9 +90,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                 }, error: error_callback
             });
     };
-    var oembed_image_callback = function(data) {
-        callback(url, data.title, image_tag(data.url));
-    };
+
     var GALLERY_FILTER = {
         '^http://photozou.jp/photo/show/(\\d+)/(\\d+)$': function(url, callback) {
             var id = url.match(/^http:\/\/photozou.jp\/photo\/show\/(\d+)\/(\d+)/)[2];
@@ -109,7 +107,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }, error: error_callback
                 });
         },
-        '^http://twitpic\\.com/(\\w+)$': function(url, callback) {
+        '^http://twitpic\\.com/(\\w+)/?$': function(url, callback) {
             var id = url.match(/^http:\/\/twitpic.com\/(\w+)$/)[1];
             $.ajax(
                 {
@@ -139,6 +137,30 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }, error: error_callback
                 });
         },
+        '^http://lightbox.com/\\w+$': function(url, callback) {
+            $.ajax(
+                {
+                    'url': url, dataType: 'html',
+                    success: function(data) {
+                        callback(
+                            url, data.match(
+                                    /<div id="photo_title"><h2 id="head_title">(.*)<\/h2>/)[1],
+                            image_tag(get_og_image(data)));
+                    }, error: error_callback
+                });
+        },
+        '^http://\\w+.tuna.be/\\d+.html$': function(url, callback) {
+            $.ajax(
+                {
+                    'url': url, dataType: 'html',
+                    success: function(data) {
+                        callback(
+                            url, data.match(
+                                    /<link rel="alternate" media="handheld" title="([^"]+)"/)[1],
+                            image_tag(url.match(/^http:\/\/\w+.tuna.be\/(\d+).html$/)[1]));
+                    }, error: error_callback
+                });
+        },
         '^http://movapic.com/pic/\\w+$': function(url, callback) {
             callback(
                 url, '', image_tag(
@@ -164,12 +186,6 @@ twi2url.match_gallery_filter = function(str, callback) {
                        callback(url, data.title, data.html);
                    });
         },
-        '\\w+.wordpress.com/.+': function(url, callback) {
-            oembed('http://public-api.wordpress.com/oembed/1.0/?' +
-                   $.param({'for': 'twi2url', format: 'json', 'url': url}),
-                   callback,
-                   function(data) { callback(url, data.title, data.html); });
-        },
         '^http://vimeo.com/\\d+$': function(url, callback) {
             oembed('http://vimeo.com/api/oembed.json?' +
                    $.param({'url': url, autoplay: true}),
@@ -180,25 +196,39 @@ twi2url.match_gallery_filter = function(str, callback) {
                    $.param({'url': url,
                             format: 'json', auto_play: true}), callback);
         },
+        '\\w+.wordpress.com/.+': function(url, callback) {
+            oembed('http://public-api.wordpress.com/oembed/1.0/?' +
+                   $.param({'for': 'twi2url', format: 'json', 'url': url}),
+                   callback, function(data) {
+                       callback(url, data.title, data.html);
+                   });
+        },
         '^http://www.slideshare.net/[^/]+/[^/]+$': function(url, callback) {
             oembed('http://www.slideshare.net/api/oembed/2?' +
                    $.param({'url': url, format: 'json'}),
-                   callback,
-                   function(data) { callback(url, data.title, data.html); });
+                   callback, function(data) {
+                       callback(url, data.title, data.html);
+                   });
         },
         '^http://instagr.am/p/[\\-\\w]+/?$': function(url, callback) {
             oembed('http://api.instagram.com/oembed?' + $.param({'url': url}),
-                   callback, oembed_image_callback);
+                   callback, function(data) {
+                       callback(url, data.title, image_tag(data.url));
+                   });
         },
         '^http://.+\\.deviantart/art/.+$': function(url, callback) {
             oembed('http://backend.deviantart.com/oembed?' +
                    $.param({'url': url}),
-                   callback, oembed_image_callback);
+                   callback, function(data) {
+                       callback(url, data.title, image_tag(data.url));
+                   });
         },
-        '^http://www.flickr.com/photos/\\w+/\\d+': function(url, callback) {
+        '^http://www.flickr.com/photos/\\w+/\\d+/?$': function(url, callback) {
             oembed('http://flickr.com/services/oembed?' +
                    $.param({'url': url, format: 'json'}),
-                   callback, oembed_image_callback);
+                   callback, function(data) {
+                       callback(url, data.title, image_tag(data.url));
+                   });
         },
         '^http://www.nicovideo.jp/watch/\\w+': function(url, callback) {
             callback(url, '', '<a rel="video" href="' + url + '" />');
