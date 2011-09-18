@@ -25,28 +25,16 @@ twi2url.match_gallery_filter = function(str, callback) {
         twi2url.urls.push(str);
     };
     var get_og_image = function(data) {
-        var m = data.match(/<meta property=["']og:image["'] content=["']([^'"]+)["']/);
-        if(m.length != 2) {
-            error_callback(m);
-            throw new Error('og:image parse error');
-        }
-        return m[1];
+        return data.match(
+                /<meta property=["']og:image["'] content=["']([^'"]+)["']/)[1];
     };
     var get_og_description = function(data) {
-        var m = data.match(/<meta property=["']og:description["'] content=["']([^'"]+)["']/);
-        if(m.length != 2) {
-            error_callback(m);
-            throw new Error('og:description parse error');
-        }
-        return unescape(m[1]);
+        return unescape(data.match(
+                                /<meta property=["']og:description["'] content=["']([^'"]+)["']/)[1]);
     };
     var get_og_title = function(data) {
-        var m = data.match(/<meta property=["']og:title["'] content=["']([^'"]+)["']/);
-        if(m.length != 2) {
-            error_callback(m);
-            throw new Error('og:title parse error');
-        }
-        return unescape(m[1]);
+        return data.match(
+                /<meta property=["']og:title["'] content=["']([^'"]+)["']/)[1];
     };
     var image_tag = function(url) { return '<img src="' + url + '">'; };
     var image_file = function(url, callback)
@@ -249,6 +237,16 @@ twi2url.match_gallery_filter = function(str, callback) {
                             url, data.match(/<p>([^<]+)<\/p>/)[1],
                             image_tag(data.match(/<img id="photo" src="([^"]+)"/)[1])
                         );
+                    }, error: error_callback
+                });
+        },
+        '^http://kokuru.com/\\w+/?': function(url, callback) {
+            $.ajax(
+                {
+                    'url': url, dataType: 'html',
+                    success: function(data) {
+                        callback(url, data.match(/<p>(.*)<\/p>\s*<span class=/m)[1],
+                                 image_tag(data.match(/http:\/\/image.kokuru.com\/file\/\d+\/real\/\w+\.jpg/)[0]));
                     }, error: error_callback
                 });
         },
