@@ -77,7 +77,7 @@ twi2url.match_gallery_filter = function(str, callback) {
     };
     var google_docs_viewer = function(url, callback) {
         twi2url.urls.push('https://docs.google.com/viewer?' +
-                          $.param({'url': encodeURIComponent(url)}));
+                          $.param({'url': url}));
     };
     var oembed = function(url, default_callback, oembed_callback) {
         $.ajax(
@@ -157,7 +157,7 @@ twi2url.match_gallery_filter = function(str, callback) {
         },
         '^http://www.youtube.com/watch\\?v=\\w+': function(url, callback) {
             oembed('http://www.youtube.com/oembed?' +
-                   $.param({'url': encodeURIComponent(url), format: 'json'}),
+                   $.param({'url': url, format: 'json'}),
                    callback, function(data) {
                        data.html = data.html.replace(
                                /(src="[^"]+)"/, '$1&autoplay=1"');
@@ -172,33 +172,32 @@ twi2url.match_gallery_filter = function(str, callback) {
         },
         '^http://vimeo.com/\\d+$': function(url, callback) {
             oembed('http://vimeo.com/api/oembed.json?' +
-                   $.param({'url': encodeURIComponent(url), autoplay: true}),
+                   $.param({'url': url, autoplay: true}),
                    callback);
         },
         '^http://soundcloud.com/.+/.+$': function(url, callback) {
             oembed('http://soundcloud.com/oembed?' +
-                   $.param({'url': encodeURIComponent(url),
+                   $.param({'url': url,
                             format: 'json', autoplay: true}), callback);
         },
         '^http://www.slideshare.net/[^/]+/[^/]+$': function(url, callback) {
             oembed('http://www.slideshare.net/api/oembed/2?' +
-                   $.param({'url': encodeURIComponent(url), format: 'json'}),
+                   $.param({'url': url, format: 'json'}),
                    callback,
                    function(data) { callback(url, data.title, data.html); });
         },
         '^http://instagr.am/p/[\\-\\w]+/?$': function(url, callback) {
-            oembed('http://api.instagram.com/oembed?' +
-                   $.param({'url': encodeURIComponent(url)}),
+            oembed('http://api.instagram.com/oembed?' + $.param({'url': url}),
                    callback, oembed_image_callback);
         },
         '^http://.+\\.deviantart/art/.+$': function(url, callback) {
             oembed('http://backend.deviantart.com/oembed?' +
-                   $.param({'url': encodeURIComponent(url)}),
+                   $.param({'url': url}),
                    callback, oembed_image_callback);
         },
-        '^http://www.flickr.com/photos/': function(url, callback) {
+        '^http://www.flickr.com/photos/\\w+/\\d+': function(url, callback) {
             oembed('http://flickr.com/services/oembed?' +
-                   $.param({'url': encodeURIComponent(url), format: 'json'}),
+                   $.param({'url': url, format: 'json'}),
                    callback, oembed_image_callback);
         },
         '^http://www.nicovideo.jp/watch/\\w+': function(url, callback) {
