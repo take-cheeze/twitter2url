@@ -4,7 +4,20 @@ var last_draw = null;
 
 function draw() {
     $('#left_count').html(get_background().twi2url.gallery_stack.length +
-                          ' items left');
+                          ' items left / (' +
+                          history.length + ' items in history)');
+    if(get_background().twi2url.gallery_stack.length === 0) {
+        $('#next_button').attr('disabled', true);
+        $('#open_button').attr('disabled', true);
+    } else {
+        $('#next_button').removeAttr('disabled');
+        $('#open_button').removeAttr('disabled');
+    }
+    if(history.length === 0) {
+        $('#prev_button').attr('disabled', true);
+    } else {
+        $('#prev_button').removeAttr('disabled');
+    }
 
     if(get_background().twi2url.gallery_stack.length > 0) {
         var current = get_background().twi2url.gallery_stack[0];

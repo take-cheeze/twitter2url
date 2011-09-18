@@ -40,7 +40,7 @@ function restore_options() {
 function changed(val) {
     val
         ? $('#save_button').removeAttr('disabled')
-        : $('#save_button').attr('disabled', 'disabled')
+        : $('#save_button').attr('disabled', true)
     ;
 }
 
