@@ -17,14 +17,14 @@ function open_gallery() {
 function backup() { get_background().twi2url.backup(); }
 function fetch() { get_background().twi2url.fetch(); }
 
-function load() {
-    var twi2url = get_background().twi2url;
-    $('#auto_open_checkbox').
-        prop('checked', twi2url.auto_open_state);
-    $('#opened').text('Opened: ' +
-                      (twi2url.can_open_tab()? '': '+') +
-                      twi2url.auto_open_count);
-    $('#unread').text('Unread: ' + twi2url.urls.length);
-    $('#gallery').text('Gallery: ' + twi2url.gallery_stack.length);
-    setTimeout(load, 500);
-}
+$(function() {
+      var twi2url = get_background().twi2url;
+      $('#auto_open_checkbox').
+          prop('checked', twi2url.auto_open_state);
+      $('#opened').text('Opened: ' +
+                        (twi2url.can_open_tab()? '': '+') +
+                        twi2url.auto_open_count);
+      $('#unread').text('Unread: ' + twi2url.urls.length);
+      $('#gallery').text('Gallery: ' + twi2url.gallery_stack.length);
+      setTimeout(load, 500);
+  });
