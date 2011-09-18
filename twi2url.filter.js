@@ -157,7 +157,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                         callback(
                             url, data.match(
                                     /<link rel="alternate" media="handheld" title="([^"]+)"/)[1],
-                            image_tag(url.match(/^http:\/\/\w+.tuna.be\/(\d+).html$/)[1]));
+                            image_tag('http://tuna.be/show/thumb/' +
+                                      url.match(/^http:\/\/\w+.tuna.be\/(\d+).html$/)[1]));
                     }, error: error_callback
                 });
         },
@@ -223,8 +224,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                        callback(url, data.title, image_tag(data.url));
                    });
         },
-        '^http://www.flickr.com/photos/\\w+/\\d+/?$': function(url, callback) {
-            oembed('http://flickr.com/services/oembed?' +
+        '^http://www.flickr.com/photos/[@\\w]+/\\d+/?$': function(url, callback) {
+            oembed('http://www.flickr.com/services/oembed?' +
                    $.param({'url': url, format: 'json'}),
                    callback, function(data) {
                        callback(url, data.title, image_tag(data.url));
