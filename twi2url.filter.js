@@ -178,7 +178,7 @@ twi2url.match_gallery_filter = function(str, callback) {
         '^http://soundcloud.com/.+/.+$': function(url, callback) {
             oembed('http://soundcloud.com/oembed?' +
                    $.param({'url': url,
-                            format: 'json', autoplay: true}), callback);
+                            format: 'json', auto_play: true}), callback);
         },
         '^http://www.slideshare.net/[^/]+/[^/]+$': function(url, callback) {
             oembed('http://www.slideshare.net/api/oembed/2?' +
