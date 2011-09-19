@@ -36,6 +36,7 @@
         "http://*.tuna.be/*.html",
         "http://tuna.be/show/*",
         "http://kokuru.com/*",
+        "http://lightbox.com/*",
         "http://www.youtube.com/oembed*",
         "http://vimeo.com/api/oembed.json*",
         "http://www.slideshare.net/api/oembed/2*",

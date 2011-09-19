@@ -67,13 +67,16 @@ twi2url.match_gallery_filter = function(str, callback) {
         twi2url.urls.push('https://docs.google.com/viewer?' +
                           $.param({'url': url}));
     };
+    var oembed_default_callback = function(data, callback) {
+        callback(url, data.description, data.html);
+    };
     var oembed = function(url, default_callback, oembed_callback) {
         $.ajax(
             {
                 'url': url, dataType: 'json',
                 success: function(data) {
                     if(oembed_callback === undefined) {
-                        default_callback(url, data.description, data.html);
+                        oembed_default_callback(data, default_callback);
                     } else { oembed_callback(data); }
                 }, error: error_callback
             });
