@@ -2,6 +2,7 @@ twi2url.timeout_when_api_reset = function(callback) {
     twi2url.oauth.getJSON(
         'https://api.twitter.com/1/account/rate_limit_status.json',
         function(data) {
+            twi2url.twitter_api_left = data.remaining_hits;
             if(data.remaining_hits > 0) {
                 callback();
             } else {

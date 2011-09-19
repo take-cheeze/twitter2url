@@ -19,6 +19,7 @@ function fetch() { get_background().twi2url.fetch(); }
 
 function draw() {
     var twi2url = get_background().twi2url;
+
     $('#auto_open_checkbox').
         prop('checked', twi2url.auto_open_state);
     $('#opened').text('Opened: ' +
@@ -26,6 +27,8 @@ function draw() {
                       twi2url.auto_open_count);
     $('#unread').text('Unread: ' + twi2url.urls.length);
     $('#gallery').text('Gallery: ' + twi2url.gallery_stack.length);
+    $('#twitter_api_left').text('API Left: ' + twi2url.twitter_api_left);
+
     setTimeout(draw, 500);
 }
 $(draw);
