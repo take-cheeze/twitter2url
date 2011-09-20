@@ -9,7 +9,7 @@
  */
 
 var consumer = consumer || {
-    CONSUMER_KEY: '', CONSUMER_SECRET: ''
+    CONSUMER_KEY: '', CONSUMER_SECRET: '', USTREAM_KEY: ''
 };
 
 var twi2url = twi2url || {

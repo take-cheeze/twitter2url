@@ -180,7 +180,7 @@ twi2url.match_gallery_filter = function(str, callback) {
         },
         '^http://vimeo.com/\\d+$': function(url, callback) {
             oembed('http://vimeo.com/api/oembed.json?' +
-                   $.param({'url': url, autoplay: true}),
+                   $.param({'url': url, autoplay: true, iframe: true}),
                    callback);
         },
         '^http://soundcloud.com/.+/.+$': function(url, callback) {
@@ -208,7 +208,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                        callback(url, data.title, image_tag(data.url));
                    });
         },
-        '^http://.+\\.deviantart/art/.+$': function(url, callback) {
+        '^http://.+\\.deviantart.com/art/.+$': function(url, callback) {
             oembed('http://backend.deviantart.com/oembed?' +
                    $.param({'url': url}),
                    callback, function(data) {
@@ -243,7 +243,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }, error: error_callback
                 });
         },
-        '^http://kokuru.com/\\w+/?': function(url, callback) {
+        '^http://kokuru.com/\\w+/?$': function(url, callback) {
             $.ajax(
                 {
                     'url': url, dataType: 'html',
@@ -251,6 +251,53 @@ twi2url.match_gallery_filter = function(str, callback) {
                         callback(url, data.match(/<p>(.*)<\/p>\s*<span class=/m)[1],
                                  image_tag(data.match(/http:\/\/image.kokuru.com\/file\/\d+\/real\/\w+\.jpg/)[0]));
                     }, error: error_callback
+                });
+        },
+        '^http://twitvideo.jp/\\w+/?$': function(url, callback) {
+            $.ajax(
+                {
+                    'url': url, dataType: 'html',
+                    success: function(data) {
+                        callback(url, data.match(/<span class="sf_comment">(.+)<\/span>/)[1],
+                                 data.match(/<input type="text" class="txt" id="vtSource" value="([^"]+)" onClick/)[1]);
+                    }, error: error_callback
+                });
+        },
+        '^http://twitcasting.tv/\\w+/?$': function(url, callback) {
+            var id = url.match(/^http:\/\/twitcasting.tv\/(\w+)\/?$/)[1];
+            callback(url, '',
+                     '<video src="http://twitcasting.tv/' + id + '/metastream.m3u8/?video=1"' +
+                     ' autoplay="true" controls="true"' +
+                     ' poster="http://twitcasting.tv/' + id + '/thumbstream/liveshot" />');
+        },
+        '^http://www.twitvid.com/\\w+/?$': function(url, callback) {
+            var id = url.match(/^http:\/\/www.twitvid.com\/(\w+)\/?$/)[1];
+            callback(url, '',
+                     '<iframe title="Twitvid video player" class="twitvid-player" type="text/html" ' +
+                     'src="http://www.twitvid.com/embed.php?' +
+                     $.param({guid: id, autoplay: 1}) + '" ' +
+                     'width=480" height="360" frameborder="0" />');
+        },
+        '^http://www.ustream.tv/recorded/\\d+$': function(url, callback) {
+            var id = url.match(/^http:\/\/www.ustream.tv\/recorded\/(\d+)$/)[1];
+            $.ajax(
+                {
+                    url: 'http://api.ustream.tv/json/video/' + id + '/getCustomEmbedTag&' +
+                        $.param({key: consumer.USTREAM_KEY, params: 'autoplay:true'}),
+                    dataType: 'json', success: function(data) {
+                        callback(url, '', data.results);
+                    }
+                });
+        },
+        '^http://www.ustream.tv/channel/[\\w\\-]+$': function(url, callback) {
+            var id = url.match(/^http:\/\/www.ustream.tv\/channel\/([\w\-]+)$/)[1];
+            $.ajax(
+                {
+                    url: 'http://api.ustream.tv/json/channel/' + id + '/getCustomEmbedTag?' +
+                        $.param({key: consumer.USTREAM_KEY, params: 'autoplay:true'}),
+                    dataType: 'json', success: function(data) {
+                        callback(url, '', data.results);
+                    }
                 });
         },
         // image file
