@@ -282,7 +282,7 @@ twi2url.match_gallery_filter = function(str, callback) {
             var id = url.match(/^http:\/\/www.ustream.tv\/recorded\/(\d+)/)[1];
             $.ajax(
                 {
-                    url: 'http://api.ustream.tv/json/video/' + id + '/getCustomEmbedTag&' +
+                    url: 'http://api.ustream.tv/json/video/' + id + '/getCustomEmbedTag?' +
                         $.param({key: consumer.USTREAM_KEY, params: 'autoplay:true'}),
                     dataType: 'json', success: function(data) {
                         callback(url, '', data.results);
