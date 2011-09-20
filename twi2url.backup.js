@@ -15,9 +15,20 @@ twi2url.timeout_auto_backup = function() {
         setTimeout(twi2url.backup,
                    parseInt(localStorage.backup_freq));
 };
-twi2url.clean_urls = function() {
+twi2url.clean_gallery = function() {
     var table = {};
-    var result = [];
+
+    $.each(
+        twi2url.gallery_stack, function(k, v) {
+            if(v.url in table) { return; }
+
+            result.push(v);
+            table[v.url] = '';
+        });
+    twi2url.gallery_stack = result;
+};
+twi2url.clean_urls = function() {
+    var table = {}, result = [];
 
     $.each(
         twi2url.urls, function(k, v) {
@@ -28,14 +39,8 @@ twi2url.clean_urls = function() {
 
             if(!twi2url.match_gallery_filter(
                    v, function(url, message, tag) {
-                       twi2url.in_history(
-                           url, function(exists) {
-                               if(exists) { return; }
-                               var t = {
-                                   'url': url, 'message': message, 'tag': tag
-                               };
-                               twi2url.gallery_stack.push(t);
-                           });
+                       var t = { 'url': url, 'message': message, 'tag': tag };
+                       twi2url.gallery_stack.push(t);
                    })) { result.push(v); }
             table[v] = '';
         }

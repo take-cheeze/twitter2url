@@ -5,7 +5,9 @@ var last_draw = null;
 function draw() {
     $('#left_count').html(get_background().twi2url.gallery_stack.length +
                           ' items left / (' +
-                          history.length + ' items in history)');
+                          history.length + ' items in history)' +
+                          ' <input type="button" value="Clean"' +
+                          ' onclick="get_background().twi2url.clean_gallery()">');
     if(get_background().twi2url.gallery_stack.length === 0) {
         $('#next_button').attr('disabled', true);
         $('#open_button').attr('disabled', true);
