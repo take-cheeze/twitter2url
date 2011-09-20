@@ -169,7 +169,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                 url + '/original', '',
                 image_tag('http://static.ow.ly/photos/normal/' + id + '.jpg'));
         },
-        '^http://www.youtube.com/watch\\?v=\\w+': function(url, callback) {
+        '^http://www.youtube.com/watch\\?v=[\\w\\-]+': function(url, callback) {
             oembed('http://www.youtube.com/oembed?' +
                    $.param({'url': url, format: 'json'}),
                    callback, function(data) {
@@ -278,8 +278,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                      $.param({guid: id, autoplay: 1}) + '" ' +
                      'width=480" height="360" frameborder="0" />');
         },
-        '^http://www.ustream.tv/recorded/\\d+$': function(url, callback) {
-            var id = url.match(/^http:\/\/www.ustream.tv\/recorded\/(\d+)$/)[1];
+        '^http://www.ustream.tv/recorded/\\d+': function(url, callback) {
+            var id = url.match(/^http:\/\/www.ustream.tv\/recorded\/(\d+)/)[1];
             $.ajax(
                 {
                     url: 'http://api.ustream.tv/json/video/' + id + '/getCustomEmbedTag&' +
@@ -289,8 +289,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }
                 });
         },
-        '^http://www.ustream.tv/channel/[\\w\\-]+$': function(url, callback) {
-            var id = url.match(/^http:\/\/www.ustream.tv\/channel\/([\w\-]+)$/)[1];
+        '^http://www.ustream.tv/channel/[\\w\\-]+': function(url, callback) {
+            var id = url.match(/^http:\/\/www.ustream.tv\/channel\/([\w\-]+)/)[1];
             $.ajax(
                 {
                     url: 'http://api.ustream.tv/json/channel/' + id + '/getCustomEmbedTag?' +
