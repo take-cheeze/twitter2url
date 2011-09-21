@@ -8,16 +8,11 @@ twi2url.match_exclude_filter = function(str) {
     return false;
 };
 twi2url.refilter_gallery = function() {
-    $.each(
-        twi2url.gallery_stack, function(k, v) {
-            if(!twi2url.match_gallery_filter(
-                   v.url, function(url, message, tag) {
-                       var t = {
-                           'url': url, 'message': message, 'tag': tag };
-                       result.push(t);
-                   })) { return; }
-        }
-    );
+    var src = twi2url.gallery_stack; // swap(twi2url.gallery_stack, src);
+    twi2url.gallery_stack = [];
+
+    $.each(src, function(k, v) { twi2url.urls.push(v.url); });
+    twi2url.clean_urls();
 };
 twi2url.match_gallery_filter = function(str, callback) {
     var error_callback = function(res) {
@@ -29,8 +24,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                 /<meta property=["']og:image["'] content=["']([^'"]+)["']/)[1];
     };
     var get_og_description = function(data) {
-        return unescape(data.match(
-                                /<meta property=["']og:description["'] content=["']([^'"]+)["']/)[1]);
+        return data.match(
+                /<meta property=["']og:description["'] content=["']([^'"]+)["']/)[1];
     };
     var get_og_title = function(data) {
         return data.match(
@@ -289,8 +284,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }
                 });
         },
-        '^http://www.ustream.tv/channel/[\\w\\-]+': function(url, callback) {
-            var id = url.match(/^http:\/\/www.ustream.tv\/channel\/([\w\-]+)/)[1];
+        '^http://www.ustream.tv/channel/.+$': function(url, callback) {
+            var id = url.match(/^http:\/\/www.ustream.tv\/channel\/(.+)$/)[1];
             $.ajax(
                 {
                     url: 'http://api.ustream.tv/json/channel/' + id + '/getCustomEmbedTag?' +

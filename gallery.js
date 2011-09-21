@@ -7,7 +7,7 @@ function draw() {
                           ' items left / (' +
                           history.length + ' items in history)' +
                           ' <input type="button" value="Clean"' +
-                          ' onclick="get_background().twi2url.clean_gallery()">');
+                          ' onclick="get_background().twi2url.refilter_gallery()">');
     if(get_background().twi2url.gallery_stack.length === 0) {
         $('#next_button').attr('disabled', true);
         $('#open_button').attr('disabled', true);
@@ -26,7 +26,7 @@ function draw() {
         if((last_draw === null) || (current.url !== last_draw.url)) {
             $('#url_bar').html(current.url);
             $('#canvas').html(current.tag);
-            $('#message').html(current.message);
+            $('#message').html(unescapeHTML(current.message));
 	        $('a[rel=video]').createVideo();
             last_draw = current;
         }
@@ -79,5 +79,12 @@ document.onkeydown = function(e) {
 function get_background() {
     return chrome.extension.getBackgroundPage();
 }
+
+function unescapeHTML(str) {
+    return $('<div />').html(str).text();
+};
+function escapeHTML(str) {
+    return $('<div />').text(str).html();
+};
 
 $(function() { window.setInterval(window.draw, 500); });
