@@ -164,7 +164,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                 url + '/original', '',
                 image_tag('http://static.ow.ly/photos/normal/' + id + '.jpg'));
         },
-        '^http://www.youtube.com/watch\\?v=[\\w\\-]+': function(url, callback) {
+        '^http://www.youtube.com/watch\\?.*v=[\\w\\-]+': function(url, callback) {
             oembed('http://www.youtube.com/oembed?' +
                    $.param({'url': url, format: 'json'}),
                    callback, function(data) {
@@ -254,7 +254,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                     'url': url, dataType: 'html',
                     success: function(data) {
                         callback(url, data.match(/<span class="sf_comment">(.+)<\/span>/)[1],
-                                 data.match(/<input type="text" class="txt" id="vtSource" value="([^"]+)" onClick/)[1]);
+                                 $('<div />').html(data.match(/<input type="text" class="txt" id="vtSource" value="([^"]+)" onClick/)[1]).text());
                     }, error: error_callback
                 });
         },
