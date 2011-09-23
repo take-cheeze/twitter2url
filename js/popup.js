@@ -8,11 +8,11 @@ function auto_open() {
 }
 function open_options() {
     get_background().twi2url.open_current_window_tab(
-        chrome.extension.getURL('options.html'), true);
+        chrome.extension.getURL('page/options.html'), true);
 }
 function open_gallery() {
     get_background().twi2url.open_current_window_tab(
-        chrome.extension.getURL('gallery.html'), true);
+        chrome.extension.getURL('page/gallery.html'), true);
 }
 function backup() { get_background().twi2url.backup(); }
 function fetch() { get_background().twi2url.fetch(); }

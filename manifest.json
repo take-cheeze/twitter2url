@@ -3,10 +3,10 @@
     "version": "0.0.6",
     "description": "Collect url from your twitter.",
 
-    "background_page": "background.html",
+    "background_page": "page/background.html",
     "browser_action": {
         "default_icon": "icons/bird_32_blue.png",
-        "default_popup": "popup.html"
+        "default_popup": "page/popup.html"
     },
     "icons": {
         "16": "icons/bird_16_blue.png",
@@ -17,5 +17,5 @@
         "background", "history", "tabs", "unlimitedStorage",
         "http://*/*", "https://*/*"
     ],
-    "options_page": "options.html"
+    "options_page": "page/options.html"
 }
