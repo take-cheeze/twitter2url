@@ -295,6 +295,27 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }
                 });
         },
+        '^http://layercloud.net/items/detail_top/\\d+/?$': function(url, callback) {
+            var id = url.match(/^http:\/\/layercloud.net\/items\/detail_top\/(\d+)\/?$/)[1];
+            $.ajax(
+                {
+                    url: url, dataType: 'html', success: function(data) {
+                        callback(
+                            url, data.match(/<p class="ItemDescription">(.*)<\/p>/m),
+                            image_tag('http://layercloud.net/img/items/' + id + '.jpg'));
+                    }
+                });
+        },
+        '^http://www.drawlr.com/d/\\w+/view/?$': function(url, callback) {
+            $.ajax(
+                {
+                    url: url, dataType: 'html', success: function(data) {
+                        callback(
+                            url, '',
+                            data.match(/var embed_code = '(.+)';/)[1]);
+                    }
+                });
+        },
         // image file
         '^.+\\.png$': image_file, '^.+\\.JPG$': image_file,
         '^.+\\.jpg$': image_file, '^.+\\.gif$': image_file,
