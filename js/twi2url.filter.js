@@ -210,7 +210,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                        callback(url, data.title, image_tag(data.url));
                    });
         },
-        '^http://www.flickr.com/photos/[@\\w]+/\\d+/?$': function(url, callback) {
+        '^http://www.flickr.com/photos/[@\\w\\-]+/\\d+/?': function(url, callback) {
             oembed('http://www.flickr.com/services/oembed?' +
                    $.param({'url': url, format: 'json'}),
                    callback, function(data) {
