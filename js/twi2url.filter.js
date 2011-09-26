@@ -93,8 +93,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }, error: error_callback
                 });
         },
-        '^http://twitpic\\.com/(\\w+)/?$': function(url, callback) {
-            var id = url.match(/^http:\/\/twitpic.com\/(\w+)$/)[1];
+        '^http://twitpic\\.com/(\\w+)(/full)?/?$': function(url, callback) {
+            var id = url.match(/^http:\/\/twitpic.com\/(\w+)(\/full)?\/?$/)[1];
             $.ajax(
                 {
                     'url': 'http://api.twitpic.com/2/media/show.json?' +
@@ -102,7 +102,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                     dataType: 'json',
                     success: function(data) {
                         callback(
-                            url + '/full', data.message,
+                            'http://twitpic.com/' + id + '/full', data.message,
                             image_tag('http://twitpic.com/show/large/' + id)
                         );
                     }, error: error_callback
