@@ -235,7 +235,7 @@ exports.OAuth = (function (global) {
             }
         }
     };
-    /** @const */ var OAUTH_VERSION_1_0 = '1.0';
+    /** @const */ var OAUTH_VERSION_1_0 = '1.0a';
 
     /**
      * OAuth
@@ -536,6 +536,7 @@ exports.OAuth = (function (global) {
 
             var url = oauth.authorizationUrl;
             this.get(this.requestTokenUrl, function (data) {
+                         console.log(data);
                 var token = oauth.parseTokenRequest(data.text);
                 oauth.setAccessToken([token.oauth_token, token.oauth_token_secret]);
                 success(url + '?' + data.text);

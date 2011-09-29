@@ -29,6 +29,10 @@ function draw() {
     $('#gallery').text('Gallery: ' + twi2url.gallery_stack.length);
     $('#twitter_api_left').text('API Left: ' + twi2url.twitter_api_left);
 
+    twi2url.is_signed_in()?
+        $('#sign_in_out').val("Sign Out").click(twi2url.signout):
+        $('#sign_in_out').val("Sign In" ).click(twi2url.signin );
+
     setTimeout(draw, 500);
 }
 $(draw);

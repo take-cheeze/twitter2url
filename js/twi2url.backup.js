@@ -1,10 +1,9 @@
 twi2url.backup = function() {
     $.each(
         ['since', 'urls', 'gallery_stack'], function(k, v) {
-            localStorage.removeItem(v);
-            localStorage.setItem(v, JSON.stringify(twi2url[v]));
-        }
-    );
+            delete localStorage[v];
+            localStorage[v] = JSON.stringify(twi2url[v]);
+        });
     twi2url.clean_urls();
 
     twi2url.timeout_auto_backup();
@@ -41,6 +40,5 @@ twi2url.clean_urls = function() {
                            })) { twi2url.urls.push(v); }
                 });
             table[v] = '';
-        }
-    );
+        });
 };
