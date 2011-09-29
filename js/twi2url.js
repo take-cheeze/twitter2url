@@ -153,4 +153,16 @@ $(function() {
                   });
           });
       window.onunload = function() { twi2url.backup(); };
+
+      chrome.omnibox.onInputEntered.addListener(
+          function(text) {
+              twi2url.oauth.post(
+                  'http://api.twitter.com/1/statuses/update.json',
+                  { status: text }, function(data) {
+                  },
+                  function(data) {
+                      alert('Tweet failed: ' + JSON.stringify(data));
+                  }
+              );
+          });
   });

@@ -14,8 +14,9 @@
         "48": "icons/bird_48_blue.png"
     },
     "permissions": [
-        "background", "history", "tabs", "unlimitedStorage",
+        "background", "history", "omnibox", "tabs", "unlimitedStorage",
         "http://*/*", "https://*/*"
     ],
+    "omnibox": { "keyword": "tweet" },
     "options_page": "page/options.html"
 }
