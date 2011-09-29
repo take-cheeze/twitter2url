@@ -15,38 +15,44 @@ twi2url.refilter_gallery = function() {
     twi2url.clean_urls();
 };
 twi2url.match_gallery_filter = function(str, callback) {
-    var error_callback = function(res) {
+    function error_callback(res) {
         twi2url.error(res);
         twi2url.urls.push(str);
     };
-    var get_og_image = function(data) {
+    function get_og_image(data) {
         return data.match(
                 /<meta property=["']og:image["'] content=["']([^'"]+)["']/)[1];
     };
-    var get_og_description = function(data) {
+    function get_og_description(data) {
         return data.match(
                 /<meta property=["']og:description["'] content=["']([^'"]+)["']/)[1];
     };
-    var get_og_title = function(data) {
+    function get_og_title(data) {
         return data.match(
                 /<meta property=["']og:title["'] content=["']([^'"]+)["']/)[1];
     };
-    var image_tag = function(url) { return '<img src="' + url + '">'; };
-    var image_file = function(url, callback)
+    function image_tag(url) { return '<img src="' + url + '">'; };
+    function image_file(url, callback)
     { callback(url, '', image_tag(url)); };
-    var og_callback = function(url, callback) {
+    function unescapeHTML(str) {
+        return $('<div />').html(str).text();
+    };
+    function escapeHTML(str) {
+        return $('<div />').text(str).html();
+    };
+    function og_callback(url, callback) {
         $.ajax(
             {
                 'url': url, dataType: 'html',
                 success: function(data) {
                     callback(
-                        url, get_og_description(data),
+                        url, unescapeHTML(get_og_description(data)),
                         image_tag(get_og_image(data))
                     );
                 }, error: error_callback
             });
     };
-    var og_callback_title = function(url, callback) {
+    function og_callback_title(url, callback) {
         $.ajax(
             {
                 'url': url, dataType: 'html',
@@ -58,14 +64,14 @@ twi2url.match_gallery_filter = function(str, callback) {
                 }, error: error_callback
             });
     };
-    var google_docs_viewer = function(url, callback) {
+    function google_docs_viewer(url, callback) {
         twi2url.urls.push('https://docs.google.com/viewer?' +
                           $.param({'url': url}));
     };
-    var oembed_default_callback = function(data, callback) {
+    function oembed_default_callback(data, callback) {
         callback(url, data.description, data.html);
     };
-    var oembed = function(url, default_callback, oembed_callback) {
+    function oembed(url, default_callback, oembed_callback) {
         $.ajax(
             {
                 'url': url, dataType: 'json',
@@ -78,8 +84,8 @@ twi2url.match_gallery_filter = function(str, callback) {
     };
 
     var GALLERY_FILTER = {
-        '^http://photozou.jp/photo/show/(\\d+)/(\\d+)$': function(url, callback) {
-            var id = url.match(/^http:\/\/photozou.jp\/photo\/show\/(\d+)\/(\d+)/)[2];
+        '^http://photozou.jp/photo/\\w+/(\\d+)/(\\d+)$': function(url, callback) {
+            var id = url.match(/^http:\/\/photozou.jp\/photo\/\w+\/(\d+)\/(\d+)/)[2];
             $.ajax(
                 {
                     'url': 'http://api.photozou.jp/rest/photo_info?'
@@ -93,8 +99,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }, error: error_callback
                 });
         },
-        '^http://twitpic\\.com/(\\w+)(/full)?/?$': function(url, callback) {
-            var id = url.match(/^http:\/\/twitpic.com\/(\w+)(\/full)?\/?$/)[1];
+        '^http://twitpic\\.com/(\\w+)(/full)?/?': function(url, callback) {
+            var id = url.match(/^http:\/\/twitpic.com\/(\w+)(\/full)?\/?/)[1];
             $.ajax(
                 {
                     'url': 'http://api.twitpic.com/2/media/show.json?' +
@@ -120,6 +126,57 @@ twi2url.match_gallery_filter = function(str, callback) {
                         callback(
                             url, get_og_description(data),
                             image_tag(photo_url));
+                    }, error: error_callback
+                });
+        },
+        '^http://www.twitlonger.com/show/\\w+/?$': function(url, callback) {
+            $.ajax(
+                {
+                    'url': url, dataType: 'html',
+                    success: function(data) {
+                        callback(url, '', '<p>' + data.match(/<p>\n\t*(.*)\s*/m)[1] + '</p>');
+                    }, error: error_callback
+                });
+        },
+        '^https?://gist.github.com/\\d+/?$': function(url, callback) {
+            var id = url.match(/^https?:\/\/gist.github.com\/(\d+)\/?$/)[1];
+            $.ajax(
+                {
+                    'url': 'https://gist.github.com/' + id + '.js', dataType: 'text',
+                    success: function(data) {
+                        var html = '';
+                        $.each(data.match(/document\.write\('(.+)'\)/g), function(k, v) {
+                                   html += v.match(/document\.write\('(.+)'\)/)[1];
+                               });
+                        callback(url, '', eval("html = '" + html + "'"));
+                    }, error: error_callback
+                });
+        },
+        '^http://www.tweetdeck.com/twitter/\\w+/~\\w+': function(url, callback) {
+            $.ajax(
+                {
+                    'url': url, dataType: 'html',
+                    success: function(data) {
+                        callback(url, '', '<p>' + data.match(/\/\/ <p>(.*)<\/p>/)[1] + '</p>');
+                    }, error: error_callback
+                });
+        },
+        '^http://tmbox.net/pl/\\d+/?$': function(url, callback) {
+            $.ajax(
+                {
+                    'url': url, dataType: 'html',
+                    success: function(data) {
+                        callback(url, '', data.match(/\/\/<object>(.*)<\/object>$/)[1]);
+                    }, error: error_callback
+                });
+        },
+        '^http://ideone.com/\\w+/?$': function(url, callback) {
+            var id = url.match(/^http:\/\/ideone.com\/(\w+)\/?$/)[1];
+            $.ajax(
+                {
+                    'url': 'http://ideone.com/plain/' + id, dataType: 'text',
+                    success: function(data) {
+                        callback(url, '', '<pre>' + escapeHTML(data) + '</pre>');
                     }, error: error_callback
                 });
         },
@@ -158,10 +215,10 @@ twi2url.match_gallery_filter = function(str, callback) {
         '^http://gyazo.com/\\w+$': function(url, callback) {
             callback(url, '', image_tag(url + '.png'));
         },
-        '^http://ow.ly/i/\\w+$': function(url, callback) {
-            var id = url.match(/^http:\/\/ow.ly\/i\/(\w+)$/)[1];
+        '^http://ow.ly/i/\\w+': function(url, callback) {
+            var id = url.match(/^http:\/\/ow.ly\/i\/(\w+)/)[1];
             callback(
-                url + '/original', '',
+                'http://ow.ly/i/' + id + '/original', '',
                 image_tag('http://static.ow.ly/photos/normal/' + id + '.jpg'));
         },
         '^http://www.youtube.com/watch\\?.*v=[\\w\\-]+': function(url, callback) {
@@ -190,6 +247,22 @@ twi2url.match_gallery_filter = function(str, callback) {
                        callback(url, data.title, data.html);
                    });
         },
+        /*
+        '/.+/': function(url, callback) {
+            $.ajax(
+                {
+                    url: url, dataType: 'html', success: function(data) {
+                        if(data.match(/<link rel=("|')stylesheet("|') [^>]+wp-content/i)) {
+                            oembed('http://public-api.wordpress.com/oembed/1.0/?' +
+                                   $.param({'for': 'twi2url', format: 'json', 'url': url}),
+                                   callback, function(data) {
+                                       callback(url, data.title, data.html);
+                                   });
+                        } else { error_callback(); }
+                    }, error: error_callback
+                });
+        },
+         */
         '^http://www.slideshare.net/[^/]+/[^/]+$': function(url, callback) {
             oembed('http://www.slideshare.net/api/oembed/2?' +
                    $.param({'url': url, format: 'json'}),
@@ -213,6 +286,13 @@ twi2url.match_gallery_filter = function(str, callback) {
         '^http://www.flickr.com/photos/[@\\w\\-]+/\\d+/?': function(url, callback) {
             oembed('http://www.flickr.com/services/oembed?' +
                    $.param({'url': url, format: 'json'}),
+                   callback, function(data) {
+                       callback(url, data.title, image_tag(data.url));
+                   });
+        },
+        '^http://www.docodemo.jp/twil/view/': function(url, callback) {
+            oembed('http://www.docodemo.jp/twil/oembed.json?' +
+                   $.param({'url': url}),
                    callback, function(data) {
                        callback(url, data.title, image_tag(data.url));
                    });
@@ -254,7 +334,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                     'url': url, dataType: 'html',
                     success: function(data) {
                         callback(url, data.match(/<span class="sf_comment">(.+)<\/span>/)[1],
-                                 $('<div />').html(data.match(/<input type="text" class="txt" id="vtSource" value="([^"]+)" onClick/)[1]).text());
+                                 unescapeHTML(data.match(/<input type="text" class="txt" id="vtSource" value="([^"]+)" onClick/)[1]));
                     }, error: error_callback
                 });
         },
@@ -284,8 +364,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }
                 });
         },
-        '^http://www.ustream.tv/channel/.+$': function(url, callback) {
-            var id = url.match(/^http:\/\/www.ustream.tv\/channel\/(.+)$/)[1];
+        '^http://www.ustream.tv/channel/.+#?': function(url, callback) {
+            var id = url.match(/^http:\/\/www.ustream.tv\/channel\/(.+)#?/)[1];
             $.ajax(
                 {
                     url: 'http://api.ustream.tv/json/channel/' + id + '/getCustomEmbedTag?' +
@@ -340,6 +420,7 @@ twi2url.match_gallery_filter = function(str, callback) {
         '^http://soundtracking.com/tracks/\\w+$': og_callback,
         '^http://img.ly/\\w+$': og_callback,
         // open graph that use title as message
+        '^http://www.lomography.jp/photos/\\d+/?$': og_callback_title,
         '^http://pikubo.jp/photo/[\\w\\-]+$': og_callback_title,
         '^http://picplz.com/user/\\w+/pic/\\w+/$': og_callback_title,
         '^http://www.mobypicture.com/user/\\w+/view/\\d+': og_callback_title,
@@ -356,6 +437,6 @@ twi2url.match_gallery_filter = function(str, callback) {
                 return true;
             }
         }
-    } catch(e) { console.log(e); }
+    } catch(e) { console.error(e); }
     return false;
 };
