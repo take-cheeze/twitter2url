@@ -138,8 +138,8 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }, error: error_callback
                 });
         },
-        '^https?://gist.github.com/\\d+/?$': function(url, callback) {
-            var id = url.match(/^https?:\/\/gist.github.com\/(\d+)\/?$/)[1];
+        '^https?://gist.github.com/\\w+/?': function(url, callback) {
+            var id = url.match(/^https?:\/\/gist.github.com\/(\w+)\/?/)[1];
             $.ajax(
                 {
                     'url': 'https://gist.github.com/' + id + '.js', dataType: 'text',
@@ -170,7 +170,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                     }, error: error_callback
                 });
         },
-        '^http://ideone.com/\\w+/?$': function(url, callback) {
+        '^https?://ideone.com/\\w+/?$': function(url, callback) {
             var id = url.match(/^http:\/\/ideone.com\/(\w+)\/?$/)[1];
             $.ajax(
                 {
@@ -418,6 +418,7 @@ twi2url.match_gallery_filter = function(str, callback) {
         '^http://seiga.nicovideo.jp/seiga/im': og_callback,
         '^http://www.pixiv.net/member_illust.php': og_callback,
         '^http://soundtracking.com/tracks/\\w+$': og_callback,
+        '^http://fotolog.cc/\\w+/?$': og_callback,
         '^http://img.ly/\\w+$': og_callback,
         // open graph that use title as message
         '^http://www.lomography.jp/photos/\\d+/?$': og_callback_title,
