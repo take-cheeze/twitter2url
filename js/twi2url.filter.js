@@ -17,7 +17,7 @@ twi2url.refilter_gallery = function() {
 twi2url.match_gallery_filter = function(str, callback) {
     function error_callback(res) {
         twi2url.error(res);
-        twi2url.urls.push(str);
+        twi2url.urls.unshift(str);
     };
     function get_og_image(data) {
         return data.match(
@@ -65,8 +65,10 @@ twi2url.match_gallery_filter = function(str, callback) {
             });
     };
     function google_docs_viewer(url, callback) {
-        twi2url.urls.push('https://docs.google.com/viewer?' +
-                          $.param({'url': url}));
+        callback(url, '',
+                 '<iframe title="Google Docs Viewer" class="google-docs-viewer" type="text/html" ' +
+                 'src="https://docs.google.com/viewer?' +
+                 $.param({'url': url, 'embedded': true}) + '" width="100%" height="600" />');
     };
     function oembed_default_callback(data, callback) {
         callback(url, data.description, data.html);
@@ -351,7 +353,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                      '<iframe title="Twitvid video player" class="twitvid-player" type="text/html" ' +
                      'src="http://www.twitvid.com/embed.php?' +
                      $.param({guid: id, autoplay: 1}) + '" ' +
-                     'width=480" height="360" frameborder="0" />');
+                     'width="480" height="360" frameborder="0" />');
         },
         '^http://www.ustream.tv/recorded/\\d+': function(url, callback) {
             var id = url.match(/^http:\/\/www.ustream.tv\/recorded\/(\d+)/)[1];
