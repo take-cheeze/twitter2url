@@ -90,4 +90,7 @@ $(function() {
           return false;
       };
       window.setInterval(window.draw, 500);
+      $('#prev_button').click(prev);
+      $('#open_button').click(open_url);
+      $('#next_button').click(next);
   });
