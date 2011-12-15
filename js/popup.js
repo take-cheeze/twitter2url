@@ -1,23 +1,7 @@
-function get_background() {
-    return chrome.extension.getBackgroundPage();
-}
-
-function auto_open() {
-    get_background().twi2url.
-        auto_open($('#auto_open_checkbox').prop('checked'));
-}
-function open_options() {
-    get_background().twi2url.open_current_window_tab(
-        chrome.extension.getURL('page/options.html'), true);
-}
-function open_gallery() {
-    get_background().twi2url.open_current_window_tab(
-        chrome.extension.getURL('page/gallery.html'), true);
-}
-function backup() { get_background().twi2url.backup(); }
-function fetch() { get_background().twi2url.fetch(); }
-
 function draw() {
+    function get_background() {
+        return chrome.extension.getBackgroundPage();
+    }
     var twi2url = get_background().twi2url;
 
     $('#auto_open_checkbox').
@@ -31,7 +15,22 @@ function draw() {
 
     twi2url.is_signed_in()?
         $('#sign_in_out').val("Sign Out").click(twi2url.signout):
-        $('#sign_in_out').val("Sign In" ).click(twi2url.signin );
+        $('#sign_in_out').val("Sign In" ).click(twi2url.signin);
+
+    $.each({
+               'auto_open': function() {
+                   get_background().twi2url.
+                       auto_open($('#auto_open_checkbox').prop('checked'));
+               },
+               'open_options': function() {
+                   window.open(chrome.extension.getURL('page/options.html'));
+               },
+               'open_gallery': function() {
+                   window.open(chrome.extension.getURL('page/gallery.html'));
+               },
+               'backup': function() { get_background().twi2url.backup(); },
+               'fetch': function() { get_background().twi2url.fetch(); },
+           }, function(k, v) { $('#' + k).click(v); });
 
     setTimeout(draw, 500);
 }

@@ -7,7 +7,7 @@
     <script src="../js/options.js"></script>
   </head>
 
-  <body onload="restore_options()">
+  <body>
     <h1>Twitter2URL Options</h1>
     <hr/>
 
@@ -16,12 +16,12 @@
     <hr/>
 
     <div id="exclude_filters"></div>
-    <input type="button" onclick="add_exclude_filter()" value="Add"/>
+    <input id="add_filter_button" type="button" value="Add"/>
 
     <hr/>
 
-    <input id="save_button" type="button" onclick="save_options()" value="Save"/>
-    <input id="restore_button" type="button" onclick="restore_options()" value="Restore"/>
-    <input id="default_button" type="button" onclick="set_default()" value="Default"/>
+    <input id="save_button" type="button" value="Save"/>
+    <input id="restore_button" type="button" value="Restore"/>
+    <input id="default_button" type="button" value="Default"/>
   </body>
 </html>

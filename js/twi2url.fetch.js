@@ -71,9 +71,7 @@ twi2url.fetch_page = function(url, name, info) {
                     if(info.new_since_id === null && data.length > 0) {
                         info.new_since_id = data[0].id_str;
                     }
-                    if(((Math.ceil(data.length / 10) * 10) >= twi2url.TWEET_MAX) &&
-                        (info.since_id !== null))
-                    {
+                    if(data.length != 0 && info.since_id !== null) {
                         info.page++;
                         twi2url.fetch_page(url, name, info);
                     } else if(info.new_since_id !== null) {
@@ -124,6 +122,7 @@ twi2url.fetch = function() {
 };
 twi2url.timeout_auto_fetch = function() {
     clearTimeout(twi2url.auto_fetch_timeout);
+    twi2url.twitter_api_left = true;
     twi2url.auto_fetch_timeout =
         setTimeout(twi2url.fetch,
                    parseInt(localStorage.check_freq));

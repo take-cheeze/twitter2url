@@ -71,7 +71,7 @@ twi2url.match_gallery_filter = function(str, callback) {
                  $.param({'url': url, 'embedded': true}) + '" width="100%" height="600" />');
     };
     function oembed_default_callback(data, callback) {
-        callback(url, data.description, data.html);
+        callback(data.url, data.description, data.html);
     };
     function oembed(url, default_callback, oembed_callback) {
         $.ajax(
@@ -427,7 +427,10 @@ twi2url.match_gallery_filter = function(str, callback) {
         '^http://pikubo.jp/photo/[\\w\\-]+$': og_callback_title,
         '^http://picplz.com/user/\\w+/pic/\\w+/$': og_callback_title,
         '^http://www.mobypicture.com/user/\\w+/view/\\d+': og_callback_title,
-        '^http://yfrog.com/(\\w*)$': og_callback_title
+        '^http://yfrog.com/(\\w*)$': og_callback_title,
+        '^.*$': function(url, callback) {
+            oembed('http://embeddit.appspot.com/fetch/?' + $.param({'url': url}), callback);
+        },
     };
     try {
         for(var k in GALLERY_FILTER) {

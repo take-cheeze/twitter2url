@@ -52,32 +52,42 @@ function draw_options() {
         'open_tab_max': 'Open Tab Max (item)',
         'tweet_max': 'Tweet Max (tweet)'
     };
-    var t = '<table>';
+    var target = $('#options');
+    target.empty();
     $.each(
         get_background().twi2url.defaults, function(k, v) {
-            t += '<tr><td>' + description[k] + '</td>' +
-                '<td><input id="' + k + '" type="text" onchange="changed(true)" /></td></tr>';
+            target
+                .append($(document.createElement('tr'))
+                        .append($(document.createElement('td'))
+                                .text(description[k]))
+                        .append($(document.createElement('td'))
+                                .append($(document.createElement('input'))
+                                        .attr({ 'type': 'number', 'id': k })
+                                        .change(function() {changed(true); })
+                                        .val(get_background().localStorage[k]))));
         }
     );
-    t += '</table>';
-    $('#options').html(t);
-
-    $.each(get_background().twi2url.defaults, function(k, v) {
-               $('#' + k).val(get_background().localStorage[k]);
-           });
 }
 
 function draw_exclude_filter() {
-    var t = '';
+    var target = $('#exclude_filters');
+    target.empty();
     $.each(
         exclude_filters, function(k, v) {
-            t += '<input type="text" id="exclude_filter_' + k + '" value="' + v + '" onchange="set_exclude_filter(' + k + ')" />' +
-                '<input type="button" onclick="remove_exclude_filter(' + k + ')" value="Remove" />' +
-                '<br>'
-            ;
-        }
-    );
-    $('#exclude_filters').html(t);
+            target
+                .append(
+                    $(document.createElement('input'))
+                        .attr({ 'type': 'url', 'id': 'exclude_filter_' + k })
+                        .val(v)
+                        .change(function() { set_exclude_filter(k); }))
+                .append(
+                    $(document.createElement('input'))
+                        .attr('type', 'button')
+                        .val("Remove")
+                        .click(function() { remove_exclude_filter(k); }))
+                .append(
+                    $(document.createElement('br')));
+        });
 
     changed(true);
 }
@@ -91,3 +101,15 @@ function set_default() {
     exclude_filters = [];
     draw_exclude_filter();
 }
+
+$(function() {
+      restore_options();
+      $.each(
+          {
+              'add_filter_button': add_exclude_filter,
+              'save_button': save_options,
+              'restore_button': restore_options,
+              'default_button': set_default
+          },
+          function(k, v) { $('#' + k).click(v); });
+  });

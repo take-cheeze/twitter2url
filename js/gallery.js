@@ -3,11 +3,14 @@ var cache = [], CACHE_SIZE = 10;
 var last_draw = null;
 
 function draw() {
-    $('#left_count').html(gallery_stack().length +
-                          ' items left / (' +
-                          history.length + ' items in history)' +
-                          ' <input type="button" value="Clean"' +
-                          ' onclick="get_background().twi2url.refilter_gallery()">');
+    $('#left_count')
+        .empty()
+        .append($(document.createElement('div')).text(
+                    gallery_stack().length + ' items left / (' + history.length + ' items in history)')
+        .append($(document.createElement('input'))
+                  .attr({ 'type': 'button' })
+                  .val('Clean')
+                  .click(get_background().twi2url.refilter_gallery)));
     if(gallery_stack().length === 0) {
         $('#next_button').attr('disabled', true);
         $('#open_button').attr('disabled', true);
